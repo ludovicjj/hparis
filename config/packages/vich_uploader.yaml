@@ -7,7 +7,13 @@ vich_uploader:
     mappings:
         thumbnail_images:
             uri_prefix: '/uploads/thumbnail'
-            upload_destination: '%kernel.project_dir%/public/uploads/thumbnail'
+            upload_destination: '%kernel.project_dir%/public/uploads/thumbnails'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            delete_on_update: true
+            delete_on_remove: true
+        picture_images:
+            uri_prefix: '/uploads/pictures'
+            upload_destination: '%kernel.project_dir%/public/uploads/pictures'
             namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
             delete_on_update: true
             delete_on_remove: true

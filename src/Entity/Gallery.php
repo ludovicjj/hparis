@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\GalleryRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Gedmo\Mapping\Annotation\Slug;
@@ -31,9 +33,13 @@ class Gallery
     #[ORM\Column]
     private ?bool $state = null;
 
+    #[ORM\ManyToMany(targetEntity: Picture::class)]
+    private Collection $pictures;
+
     public function __construct()
     {
         $this->state = false;
+        $this->pictures = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -85,6 +91,30 @@ class Gallery
     public function setState(bool $state): self
     {
         $this->state = $state;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Picture>
+     */
+    public function getPictures(): Collection
+    {
+        return $this->pictures;
+    }
+
+    public function addPicture(Picture $picture): self
+    {
+        if (!$this->pictures->contains($picture)) {
+            $this->pictures->add($picture);
+        }
+
+        return $this;
+    }
+
+    public function removePicture(Picture $picture): self
+    {
+        $this->pictures->removeElement($picture);
 
         return $this;
     }
