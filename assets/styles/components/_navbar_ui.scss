@@ -1,0 +1,118 @@
+// Navbar
+.header {
+    background-color: #FFFFFF;
+    box-shadow: 0 0 25px $box-shadow-color;
+    position: relative;
+    width: 100%;
+}
+
+// Navbar Brand
+.header .navbar-brand {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+}
+.header .navbar-brand img {
+    width: auto;
+    height: 100%;
+}
+
+// Navbar Item
+.header .navbar-collapse {
+    justify-content: center;
+}
+.header .navbar-collapse .navbar-nav {
+    gap: .5rem
+}
+
+// Navbar Hamburger
+.header .navbar-toggler {
+    border: none;
+    &:focus {
+        box-shadow: none;
+    }
+}
+.header .hamburger {
+    fill: $hamburger-color;
+}
+.navbar-toggler[aria-expanded="true"] {
+    & .top, & .bottom {
+        y: 45;
+        rotate: 45deg;
+    }
+    & .middle {
+        opacity: 0;
+    }
+    & .bottom {
+        rotate: -45deg;
+    }
+    & .line {
+        transition: y .2s ease-in, rotate .2s ease-in .2s, opacity 0s .2s;
+    }
+}
+.navbar-toggler .line {
+    transition: y .2s ease-in .2s, rotate .2s ease-in, opacity 0s .2s;
+    transform-origin: center;
+}
+// Navbar Placeholder
+.header.is-fixed + .navbar-placeholder {
+    height: 76px;
+}
+
+// Navbar State
+.header.is-hidden {
+    transform: translateY(-100%);
+}
+.header.is-fixed {
+    position: fixed;
+    transition: transform .3s ease-in-out;
+}
+.header.is-open {
+    position: fixed;
+    height: 100vh;
+}
+.header.is-open .container-fluid {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: flex-start;
+}
+.header .container-fluid .navbar-collapse {
+    position: relative;
+    top: calc(50% - 70px);
+    transform: translateY(-50%);
+}
+.header .container-fluid .navbar-collapse .nav-item{
+    opacity: 0;
+    transition: opacity 0s;
+    text-align: center;
+}
+.header.is-open .container-fluid .navbar-collapse .nav-item {
+    opacity: 1;
+    transition: opacity 1s ease-in-out;
+}
+@media (min-width: 992px) {
+    .header.is-open {
+        position: relative;
+        height: auto;
+    }
+    .header.is-open.is-fixed {
+        position: fixed;
+    }
+    .header.is-open .container-fluid {
+        flex-wrap: nowrap;
+    }
+    .header .container-fluid .navbar-collapse {
+        top: auto;
+        transform: translateY(0);
+    }
+    .header .container-fluid .navbar-collapse .nav-item{
+        opacity: 1;
+        text-align: initial;
+    }
+    body {
+        overflow: auto !important;
+    }
+}

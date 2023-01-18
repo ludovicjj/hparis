@@ -1,0 +1,39 @@
+footer {
+    padding: 2rem 0 3rem;
+    font-size: 14px;
+}
+footer .row {
+    gap: 1rem;
+}
+footer .contact {
+    display: flex;
+    justify-content: center;
+}
+footer .logo {
+    justify-content: center;
+    align-items: center;
+}
+footer .logo img {
+    width: 36px;
+    height: auto;
+}
+footer .social {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+}
+@media (min-width: 768px) {
+    footer .row {
+        gap: 0;
+    }
+    footer .contact {
+        justify-content: flex-start;
+    }
+    footer .social {
+        justify-content: flex-end;
+        font-size: 1rem;
+    }
+}

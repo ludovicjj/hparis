@@ -1,0 +1,15 @@
+@import "./helper/variables";
+@import "~bootstrap";
+@import "~@fortawesome/fontawesome-free/css/all.css";
+
+/** page-wrapper **/
+.page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+}
+.bold {
+    font-weight: bold;
+}
