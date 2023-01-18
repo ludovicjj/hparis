@@ -28,6 +28,14 @@ class Gallery
     #[ORM\JoinColumn(nullable: false)]
     private ?Thumbnail $thumbnail = null;
 
+    #[ORM\Column]
+    private ?bool $state = null;
+
+    public function __construct()
+    {
+        $this->state = false;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -65,6 +73,18 @@ class Gallery
     public function setThumbnail(Thumbnail $thumbnail): self
     {
         $this->thumbnail = $thumbnail;
+
+        return $this;
+    }
+
+    public function isState(): ?bool
+    {
+        return $this->state;
+    }
+
+    public function setState(bool $state): self
+    {
+        $this->state = $state;
 
         return $this;
     }
