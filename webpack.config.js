@@ -23,7 +23,7 @@ Encore
     .addEntry('app', './assets/js/app.js')
     .addEntry('app_ui', './assets/js/app_ui.js')
     .addStyleEntry('home', './assets/styles/home.scss')
-    .addStyleEntry('login', './assets/styles/login.scss')
+    .addEntry('login', './assets/js/login.js')
 
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
     //.enableStimulusBridge('./assets/controllers.json')

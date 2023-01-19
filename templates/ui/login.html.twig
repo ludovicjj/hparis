@@ -2,6 +2,8 @@
 
 {% block javascripts %}
     {{ parent() }}
+
+    {{ encore_entry_script_tags('login') }}
 {% endblock %}
 
 {% block stylesheets %}
@@ -34,7 +36,10 @@
                         </div>
                         <div class="mb-3">
                             <label for="password">Mot de passe:</label>
-                            <input type="password" id="password" name="_password" class="form-control">
+                            <div class="d-flex align-items-center">
+                                <input type="password" id="password" name="_password" class="form-control" autocomplete="on">
+                                <span class="password-icon"><i class="fa-regular fa-eye-slash"></i></span>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <div class="form-check">

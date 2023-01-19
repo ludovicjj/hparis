@@ -26,6 +26,14 @@
     border-radius: var(--card-img-border-radius) var(--card-img-border-radius) 0 0;
 }
 
+// password
+.password-icon {
+    margin-left: -2rem;
+}
+.password-icon.show {
+    color: #1771E6;
+}
+
 @media (min-width: 992px) {
     .login-container {
         margin: 1rem auto 1rem;
