@@ -1,5 +1,5 @@
 footer {
-    padding: 2rem 0 3rem;
+    padding: 1rem 0 3rem;
     font-size: 14px;
 }
 footer .row {
@@ -26,6 +26,9 @@ footer .social {
     font-size: 1.5rem;
 }
 @media (min-width: 768px) {
+    footer {
+        padding: 2rem 0 3rem;
+    }
     footer .row {
         gap: 0;
     }
