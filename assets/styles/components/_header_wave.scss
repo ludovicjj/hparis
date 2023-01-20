@@ -1,8 +1,6 @@
 .wave-header {
-    --wave-color: #4869ee;
-    --breadcrumb-color: #effbec;
     & .wave-header_background {
-        background-color: var(--wave-color);
+        background-color: var(--main-color);
     }
     & .container {
         display: flex;

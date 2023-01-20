@@ -2,6 +2,15 @@
 @import "~bootstrap";
 @import "~@fortawesome/fontawesome-free/css/all.css";
 
+:root {
+    --main-color: #4869ee;
+    --main-dark-color: #3c5be3;
+    --main-dark-color-rgba: rgba(60,91,227,.5);
+    --breadcrumb-color: #effbec;
+    --box-shadow-rgba: rgba(17, 1, 68, 0.08);
+    --hamburger-color: #333;
+}
+
 /** page-wrapper **/
 .page-wrapper {
     min-height: 100vh;
@@ -14,16 +23,16 @@
     font-weight: bold;
 }
 .btn.btn-main {
-    background-color: $main-color;
-    border: solid 1px $main-color;
+    background-color: var(--main-color);
+    border: solid 1px var(--main-color);
     color: #fff;
 }
 .btn.btn-main:hover,
 .btn.btn-main:active {
-    background-color: $main-hover-color;
-    border-color: $main-hover-color;
+    background-color: var(--main-dark-color);
+    border-color: var(--main-dark-color);
     color: #fff;
 }
 .btn.btn-main:focus-visible {
-    box-shadow: 0 0 0 0.25rem rgba(60,91,227,.5);
+    box-shadow: 0 0 0 0.25rem var(--main-dark-color-rgba);
 }
