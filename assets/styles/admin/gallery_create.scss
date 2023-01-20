@@ -1,0 +1,94 @@
+@import "../helper/variables";
+@import "../components/custom_checkbox";
+@import '../components/header_wave';
+
+.gallery-form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: 1rem;
+}
+footer {
+    height: 100px;
+}
+
+// Field Mandatory
+.mandatory {
+    color: $main-color;
+    font-weight: bold;
+}
+// Submit
+#gallery_submit {
+    display: block;
+    width: 100%;
+}
+
+// input File
+.target-preview {
+    position: relative;
+}
+input[type="file"] {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    pointer-events: none;
+    opacity: 0;
+}
+input[type="file"]:focus + label {
+    box-shadow: 0 0 0 0.25rem #c4dbf9;
+}
+
+// Thumbnail
+.thumbnail {
+    display: flex;
+    flex-direction: column;
+}
+.thumbnail .image_label {
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    box-shadow: 0 0 25px $box-shadow-color;
+    padding: 1rem;
+    width: 75%;
+    height: 300px;
+    max-height: 300px;
+    margin: 0 auto;
+    cursor: pointer;
+}
+.thumbnail .image_label img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.thumbnail .help-text{
+    text-align: center;
+}
+.thumbnail .col-form-label {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: .5rem;
+}
+
+@media (min-width: 992px) {
+    .thumbnail .image_label {
+        width: 300px;
+        margin: 0 0;
+    }
+    .thumbnail .help-text{
+        text-align: left;
+    }
+
+
+    .gallery-form-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+    }
+    .gallery-form-grid .grid-item-left {
+        grid-column: 1 / 3;
+    }
+    .gallery-form-grid .grid-item-right {
+        padding-left: 1rem;
+    }
+    #gallery_submit {
+        display: inline-block;
+        width: auto;
+    }
+}

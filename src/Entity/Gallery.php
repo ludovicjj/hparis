@@ -36,6 +36,9 @@ class Gallery
     #[ORM\ManyToMany(targetEntity: Picture::class)]
     private Collection $pictures;
 
+    #[ORM\ManyToOne(inversedBy: 'galleries')]
+    private ?Category $category = null;
+
     public function __construct()
     {
         $this->state = false;
@@ -115,6 +118,18 @@ class Gallery
     public function removePicture(Picture $picture): self
     {
         $this->pictures->removeElement($picture);
+
+        return $this;
+    }
+
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): self
+    {
+        $this->category = $category;
 
         return $this;
     }

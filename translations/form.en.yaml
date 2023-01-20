@@ -1,0 +1,17 @@
+form:
+    gallery:
+        title:
+            label: 'Titre <span class="mandatory">*</span>'
+            help: "Le titre de votre galerie"
+        category:
+            label: "Catégorie"
+            help: "Associez la galerie à une catégorie. Exemple: Mariage"
+            placeholder: "Sélectionnez une catégorie"
+        state:
+            label: "public"
+            help: "Définissez si la galerie est privée ou publique"
+        thumbnail:
+            label: 'Images à la une <span class="mandatory">*</span>'
+            help: "Une image qui représentera votre galerie"
+        submit:
+            label: "Sauvegarder"

@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Category;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -23,6 +24,14 @@ class AppFixtures extends Fixture
             ->setPassword($hashedPassord)
         ;
         $manager->persist($user);
+
+        $categories = ['Mariage', 'Life Style', 'Mode', 'Old School', 'Art'];
+        foreach ($categories as $categoryName) {
+            $category = new Category();
+            $category->setName($categoryName);
+            $manager->persist($category);
+        }
+
         $manager->flush();
     }
 }
