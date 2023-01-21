@@ -6,6 +6,7 @@ use App\Repository\ThumbnailRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ThumbnailRepository::class)]
 #[Vich\Uploadable]
@@ -17,6 +18,16 @@ class Thumbnail
     private ?int $id = null;
 
     #[Vich\UploadableField(mapping: 'thumbnail_images', fileNameProperty: 'imageName', size: 'imageSize', originalName: 'originalName')]
+    #[Assert\NotBlank(message: "Vous devez choisir une image à la une.")]
+    #[Assert\File(
+        maxSize: '1024k',
+        extensions: [
+//            'jpg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif'
+        ],
+        extensionsMessage: 'Seuls les fichiers JPG, PNG et GIF sont autorisés.',
+    )]
     private ?File $imageFile = null;
 
     #[ORM\Column(type: 'string')]

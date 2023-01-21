@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation\Slug;
 
 #[ORM\Entity(repositoryClass: GalleryRepository::class)]
@@ -20,6 +21,7 @@ class Gallery
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Vous devez donner un titre à votre galerie.")]
     private ?string $title = null;
 
     #[ORM\Column(length: 190, unique: true)]
@@ -28,12 +30,14 @@ class Gallery
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\Valid]
     private ?Thumbnail $thumbnail = null;
 
     #[ORM\Column]
     private ?bool $state = null;
 
     #[ORM\ManyToMany(targetEntity: Picture::class)]
+    #[Assert\Valid]
     private Collection $pictures;
 
     #[ORM\ManyToOne(inversedBy: 'galleries')]

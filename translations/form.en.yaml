@@ -13,5 +13,7 @@ form:
         thumbnail:
             label: 'Images à la une <span class="mandatory">*</span>'
             help: "Une image qui représentera votre galerie"
+        uploads:
+            label: "Télécharger"
         submit:
             label: "Sauvegarder"

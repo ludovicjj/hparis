@@ -80,7 +80,25 @@
                         </div>
                     </div>
                 </div>
-                {{ form_end(form) }}
+                <div class="uploads">
+                    {{ form_label(form.uploads) }}
+                    <button type="button" id="new-upload" class="btn btn-main btn-sm" data-collection-holder-class="uploads-grid">Ajouter une image</button>
+                    <div class="uploads-grid my-3"
+                         data-prototype="{{ include("partials/_upload.html.twig", {form: form.uploads.vars.prototype})|e('html_attr') }}"
+                         data-index="{{ form.uploads|length > 0 ? form.uploads|last.vars.name + 1 : 0 }}"
+                    >
+                        <div class="upload-help">
+                            <span><i class="fa-regular fa-image"></i></span>
+                            <p>Aucune image sélectionnée pour le moment</p>
+                        </div>
+
+                        {% for upload in form.uploads %}
+                            {{ include("partials/_upload.html.twig", {form: upload}) }}
+                        {% endfor %}
+                    </div>
+                </div>
+                {{ form_row(form.submit) }}
+                {{ form_end(form, {render_rest: false}) }}
             </section>
         </main>
         <footer></footer>

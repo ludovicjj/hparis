@@ -2,7 +2,8 @@
 .form-check {
     --border: #D1D5DB;
     --cursor: #89909E;
-    --checked: #1771E6;
+    //--checked: #1771E6;
+    --checked: var(--main-color);
     --checked-cursor: #FFFFFF;
     position: relative;
     padding-left: 0;

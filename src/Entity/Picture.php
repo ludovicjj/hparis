@@ -6,6 +6,7 @@ use App\Repository\PictureRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PictureRepository::class)]
 #[Vich\Uploadable]
@@ -17,6 +18,15 @@ class Picture
     private ?int $id = null;
 
     #[Vich\UploadableField(mapping: 'picture_images', fileNameProperty: 'imageName', size: 'imageSize', originalName: 'originalName')]
+    #[Assert\File(
+        maxSize: '1024k',
+        extensions: [
+//            'jpg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif'
+        ],
+        extensionsMessage: 'Seuls les fichiers JPG, PNG et GIF sont autorisés.',
+    )]
     private ?File $imageFile = null;
 
     #[ORM\Column(type: 'string')]
