@@ -65,7 +65,7 @@ class GalleryType extends AbstractType
             ->add('submit', SubmitType::class, [
                 'label' => 'form.gallery.submit.label',
                 'attr' => [
-                    'class' => 'btn-main'
+                    'class' => 'btn-main',
                 ]
             ])
             ;

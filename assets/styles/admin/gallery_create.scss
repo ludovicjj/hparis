@@ -1,13 +1,11 @@
 @import "../components/custom_checkbox";
 @import '../components/header_wave';
+@import "../components/footer_wave";
 
 .gallery-form-grid {
     display: grid;
     grid-template-columns: 1fr;
     column-gap: 1rem;
-}
-footer {
-    height: 100px;
 }
 
 // Field Mandatory
@@ -16,7 +14,7 @@ footer {
     font-weight: bold;
 }
 // Submit
-#gallery_submit {
+#submit {
     display: block;
     width: 100%;
 }
@@ -84,26 +82,28 @@ input[type="file"]:focus + label {
     border-radius: 8px;
     border: dashed 2px var(--main-dark-color);
     padding: .625rem;
+
+    min-height: 112px;
+    transition: height .4s ease-in-out;
+    position: relative;
 }
 .uploads-grid .upload-help {
     color: var(--main-color);
-    grid-column-start: 1;
-    grid-column-end: -1;
+    grid-column: 1 / -1;
     text-align: center;
-    opacity: 1;
-    transform: translateX(0);
-    transition: opacity 1s, transform 1s;
-}
-.uploads-grid .upload-help.hidden {
-    display: none;
-    opacity: 0;
-}
-.uploads-grid .invalid-feedback {
-    display: block;
 }
 .uploads-grid .upload-help span{
     font-size: 2rem;
 }
+.uploads-grid .upload-help.hidden {
+    position: absolute;
+    width: 100%;
+    top: .625rem
+}
+.uploads-grid .invalid-feedback {
+    display: block;
+}
+
 .upload-wrapper {
     width: 100%;
     position: relative;
@@ -178,7 +178,7 @@ input[type="file"]:focus + label {
     .gallery-form-grid .grid-item-right {
         padding-left: 1rem;
     }
-    #gallery_submit {
+    #submit {
         display: inline-block;
         width: auto;
     }

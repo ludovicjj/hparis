@@ -15,33 +15,16 @@
 {% endblock %}
 
 {% block body %}
+    {% set breadcrumb = [{'label': 'Admin','path': '#'},{'label': 'Gallery','path': '#'},{'label': 'Ajouter','path': '#'}] %}
+
     <div class="page-wrapper">
-        <header class="wave-header">
-            <div class="wave-header_background">
-                <div class="container">
-                    <div>
-                        <div class="breadcrumb">
-                            <a href="#" class="breadcrumb-link">Admin</a>
-                            <i class="fa-solid fa-chevron-right"></i>
-                            <a href="#" class="breadcrumb-link">Galerie</a>
-                        </div>
-                        <div class="wave-header_body">
-                            <h1 class="wave-header_title">Ajouter une galerie</h1>
-                            <p>
-                                Cette page vous permet de créer votre propre galerie.
-                                Veuillez noter que les champs suivis d'un astérisque (*) sont obligatoires et doivent être remplis pour que la création de la galerie soit possible.
-                                Pensez à sauvegarder quand vous êtes satisfait !
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="wave">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" class="wave-svg" preserveAspectRatio="none">
-                    <path fill="#4869ee" fill-opacity="1" d="M0,160L80,165.3C160,171,320,181,480,160C640,139,800,85,960,64C1120,43,1280,53,1360,58.7L1440,64L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z"></path>
-                </svg>
-            </div>
-        </header>
+        {{ include ('partials/_wave_header.html.twig', {
+            title : 'Ajouter une galerie',
+            description : "Cette page vous permet de créer votre propre galerie.
+            Veuillez noter que les champs suivis d'un astérisque (*) sont obligatoires et doivent être remplis pour que la création de la galerie soit possible.
+            Pensez à sauvegarder quand vous êtes satisfait !",
+            breadcrumbs: [{'label': 'Admin','path': '#'},{'label': 'Gallery','path': '#'},{'label': 'Ajouter','path': '#'}]
+        }) }}
 
         <main class="container pt-4">
             <section class="gallery-action">
@@ -91,16 +74,12 @@
                             <span><i class="fa-regular fa-image"></i></span>
                             <p>Aucune image sélectionnée pour le moment</p>
                         </div>
-
-                        {% for upload in form.uploads %}
-                            {{ include("partials/_upload.html.twig", {form: upload}) }}
-                        {% endfor %}
                     </div>
                 </div>
                 {{ form_row(form.submit) }}
                 {{ form_end(form, {render_rest: false}) }}
             </section>
         </main>
-        <footer></footer>
+        {{ include('partials/_footer_wave.html.twig') }}
     </div>
 {% endblock %}

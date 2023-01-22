@@ -1,0 +1,14 @@
+.wave-footer {
+    margin-top: 2rem;
+}
+.wave-footer .wave-footer-svg {
+    fill: var(--main-color);
+    width: 100%;
+}
+.wave-footer::after {
+    content: "";
+    display: block;
+    height: 50px;
+    width: 100%;
+    background-color: var(--main-color);
+}

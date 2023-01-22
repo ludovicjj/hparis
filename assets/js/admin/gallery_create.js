@@ -1,36 +1,50 @@
 import '../../styles/admin/gallery_create.scss';
-import { addFormToCollection } from "../components/collection_holder";
+import { CollectionHolder } from "../components/CollectionHolder";
 import { imagePreview } from "../components/image_preview";
 import Swal from 'sweetalert2'
 
 
-//let result = originalProperty.split('.').map((prop, index) => index > 0 ? `[${prop}]` : prop).join('');
 
-const form = document.querySelector('#form-gallery');
-form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const submit = form.querySelector('button[type="submit"]');
-    submit.setAttribute('disabled', 'disabled')
+const collectionHolder = new CollectionHolder({
+    formClassName: '.upload-wrapper',
+    deleteClassName: '.upload-remove',
+    helperClassName: '.upload-help'
+});
 
-    const url = form.getAttribute('action');
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: new FormData(form)
-    }).then(async response => {
-        submit.removeAttribute('disabled');
-        const isJson = response.headers.get('content-type')?.includes('application/json');
-        const data = isJson ? await response.json() : null;
+class GalleryForm {
+    constructor(form, addUploadBtn) {
+        this.form = form
+        this.addUploadBtn = addUploadBtn;
 
-        // clear invalid-feedback
-        removeInvalidFeedback();
-        // clear invalid style
-        removeInvalidStyle();
+        this.form.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', (e) => {
+                imagePreview(e, '.target-preview', '.image_label img')
+            })
+        })
 
-        if (response.ok) {
-            form.reset();
+        this.form.addEventListener('submit', this.handleSubmit.bind(this))
+        this.form.addEventListener('reset', this.handleReset.bind(this))
+        this.addUploadBtn.addEventListener('click', this.addUploadField)
+    }
+
+    async handleSubmit(e) {
+        e.preventDefault();
+        const url = this.form.getAttribute('action');
+
+        this.removeInvalidFeedback();
+        this.removeInvalidStyle();
+        this.disableSubmit(true);
+        this.clearEmptyCollection();
+
+        const response = await this.send(url, 'POST', new FormData(form))
+        this.disableSubmit(false);
+
+        if (!response.ok) {
+            const errors = await response.json();
+            const transformedErrors = this.transformPropertyErrors(errors.errors)
+            this.displayErrors(transformedErrors)
+        } else {
+            this.form.reset();
             Swal.fire({
                 icon: 'success',
                 title: 'Bravo',
@@ -38,91 +52,163 @@ form.addEventListener('submit', (e) => {
                 confirmButtonColor: '#4869ee',
                 confirmButtonText: 'Cool'
             })
-        } else {
-            return Promise.reject(data.errors);
         }
-    }).catch(errors => {
-        const transformedErrors = transformProperty(errors);
-        transformedErrors.forEach(error => {
-            const field = document.querySelector(`input[name="${error.property}"]`)
-            field.classList.add('is-invalid');
+    }
 
-            const invalidFeedBack = document.createElement('div');
-            invalidFeedBack.classList.add('invalid-feedback');
-            invalidFeedBack.innerHTML = error.message;
+    displayErrors(errors) {
+        const UploadCollectionHolder = this.form.querySelector('.uploads-grid');
+        const uploadForms = Array.from(UploadCollectionHolder.querySelectorAll('.upload-wrapper'));
 
-            const parentField = field.closest(`.${error.parentClass}`);
-            parentField.appendChild(invalidFeedBack);
-            parentField.classList.add('is-invalid');
+        errors.forEach(error => {
+            let field;
+            if (error?.type === "collection") {
+                field = uploadForms[error.position];
+            } else {
+                field = document.querySelector(`input[name="${error.property}"]`)
+            }
+
+            if (field) {
+                field.classList.add('is-invalid');
+
+                const invalidFeedback = this.createInvalidFeedback(error.message);
+
+                const parentField = field.closest(`.${error.parentClass}`);
+                parentField.appendChild(invalidFeedback);
+                parentField.classList.add('is-invalid');
+            }
         })
-        // errors.forEach((error) => {
-        //     let parentClass = error.property;
-        //     if (error.property.includes('.')) {
-        //         let transformedProperty = error.property.replace(/(^\w+)|(\.\w+)/g, (match, p1, p2) => {
-        //             if (p1) {
-        //                 parentClass = p1;
-        //             }
-        //             return p1 ? p1 : "[" + p2.slice(1) + "]"
-        //         });
-        //         error.property = `${transformedProperty}[file]`;
-        //         parentClass = 'target-preview';
-        //     }
-        //
-        //     const field = document.querySelector(`input[name="${error.property}"]`)
-        //     field.classList.add('is-invalid');
-        //     const invalidFeedBack = document.createElement('div');
-        //     invalidFeedBack.classList.add('invalid-feedback');
-        //     invalidFeedBack.innerHTML = error.message;
-        //     const parentField = field.closest(`.${parentClass}`);
-        //     parentField.appendChild(invalidFeedBack);
-        //     parentField.classList.add('is-invalid');
-        // })
-    })
-})
+    }
 
-const removeInvalidFeedback = () => {
-    form.querySelectorAll('.invalid-feedback').forEach(feedback => {
-        feedback.remove();
-    })
-}
-const removeInvalidStyle = () => {
-    form.querySelectorAll('.is-invalid').forEach(element => {
-        element.classList.remove('is-invalid');
-    })
-}
-const transformProperty = (errors) => {
-    errors.forEach(error => {
-        if (error.property.includes('.')) {
-            const regex = /(^\w+)|(\.\w+)/g;
+    /**
+     * @param {Object[]} errors
+     * @return {Object[]}
+     */
+    transformPropertyErrors(errors) {
+        const regex = /(^\w+)|(\.\w+)/g;
 
-            const transformedProperty = error.property.replace(regex, (match, field, child) => {
-                return field ? field : "[" + child.slice(1) + "]"
-            }).replace('pictures', 'uploads');
+        return errors.map(error => {
+            let property = error.property;
 
-            error.property = `${transformedProperty}[file]`
-            error.parentClass = 'target-preview'
+            error.parentClass = property
+            // transform property to match with field name
+            if (property.includes('.')) {
+                property = property
+                    .replace('pictures', 'uploads')
+                    .replace(regex, (match, field, child) => {
+                        return field ? field : "[" + child.slice(1) + "]"
+                    })
+                error.property = property + '[file]';
+                error.parentClass = 'target-preview'
+            }
+
+            // collection
+            if (property.startsWith('uploads')) {
+                let position = error.property.match(/\d+/)
+                error.type = 'collection';
+                error.position = position[0]
+            }
+
+            return error;
+        })
+
+    }
+
+    /**
+     * Reset form when success
+     */
+    handleReset() {
+        // Reset thumbnail
+        const thumbnail = this.form.querySelector('.thumbnail img');
+        thumbnail.setAttribute('src', thumbnail.dataset.origin);
+
+        // remove each upload form into collection
+        const uploadCollection = this.form.querySelector('.uploads-grid');
+        uploadCollection.querySelectorAll('.upload-wrapper').forEach(upload => {
+            uploadCollection.removeChild(upload);
+        })
+
+        // display upload help
+        const helper = uploadCollection.querySelector('.upload-help');
+        helper.animate([
+            {
+                transform: 'translate(170px)',
+                opacity: 0
+            },
+            {
+                transform: 'none',
+                opacity: 1
+            },
+        ], {
+            duration: 400,
+            easing: 'ease-in-out',
+            fill: 'both'
+        });
+        window.setTimeout(_ => {
+            helper.classList.remove('hidden');
+        }, 400)
+    }
+
+    clearEmptyCollection() {
+        const uploadCollection = this.form.querySelector('.uploads-grid');
+
+        uploadCollection.querySelectorAll('input[type="file"]').forEach(inputFileUploads => {
+            if (!inputFileUploads.files.length) {
+                let upload = inputFileUploads.closest('.upload-wrapper');
+                upload.parentNode.removeChild(upload);
+            }
+        })
+    }
+
+    addUploadField(e) {
+        collectionHolder.addFormToCollection(e)
+    }
+
+    /**
+     * @param {string} message
+     * @return {HTMLElement}
+     */
+    createInvalidFeedback(message) {
+        const invalidFeedBack = document.createElement('div');
+        invalidFeedBack.classList.add('invalid-feedback');
+        invalidFeedBack.innerText = message;
+        return invalidFeedBack;
+    }
+
+    removeInvalidFeedback() {
+        this.form.querySelectorAll('.invalid-feedback').forEach(feedback => {
+            feedback.remove();
+        })
+    }
+
+    removeInvalidStyle() {
+        this.form.querySelectorAll('.is-invalid').forEach(element => {
+            element.classList.remove('is-invalid');
+        })
+    }
+
+    disableSubmit(state) {
+        const submit = this.form.querySelector('button[type="submit"]');
+        if (state) {
+            submit.setAttribute('disabled', 'disabled')
         } else {
-            error.parentClass = error.property
+            submit.removeAttribute('disabled');
         }
-    })
-    return errors
+    }
+
+    /**
+     * @param url
+     * @param method
+     * @param body
+     * @return {Promise<Response>}
+     */
+    send(url, method, body) {
+        return fetch(url, {
+            method,
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            body
+        })
+    }
 }
-
-// Reset form
-form.addEventListener('reset', () => {
-    // clear thumbnail
-    const thumbnail = form.querySelector('.thumbnail img');
-    thumbnail.setAttribute('src', thumbnail.dataset.origin);
-})
-
-// Load preview image
-document.querySelectorAll('input[type="file"]').forEach(input => {
-    input.addEventListener('change', (e) => {
-        imagePreview(e, '.target-preview', '.image_label img')
-    })
-})
-
-// Add upload field
-document.querySelector('#new-upload').addEventListener('click', (e) => {
-    addFormToCollection(e, '.upload-wrapper', '.upload-remove')
-});
+const form = document.querySelector('#form-gallery');
+const addUploadBtn = document.querySelector('#new-upload');
+new GalleryForm(form, addUploadBtn)

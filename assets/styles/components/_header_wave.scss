@@ -43,11 +43,12 @@
     top: -1px;
     pointer-events: none;
 }
-.wave-header .wave .wave-svg {
+.wave-header .wave .wave-header-svg {
     max-height: 200px;
     width: 100%;
     margin: auto;
     display: block;
+    fill: var(--main-color);
 }
 @media (min-width: 576px) {
     .wave-header .wave {
