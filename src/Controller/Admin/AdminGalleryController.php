@@ -16,6 +16,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[Route('/admin', name: 'admin_')]
 class AdminGalleryController extends AbstractController
 {
+    #[Route('/gallery', name: 'gallery')]
+    public function index(): Response
+    {
+        return $this->render('admin/gallery_index.html.twig');
+    }
+
     #[Route('/gallery/create', name: 'gallery_create')]
     public function create(
         Request $request,
@@ -29,6 +35,8 @@ class AdminGalleryController extends AbstractController
 
         if ($request->isXmlHttpRequest() && $request->isMethod('POST')) {
             $gallery = $galleryHandler->handle($request);
+            dd($gallery);
+
             $constraintList = $validator->validate($gallery);
             ErrorsValidationBuilder::buildErrors($constraintList);
 

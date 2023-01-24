@@ -1,0 +1,43 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('admin_gallery_index') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('admin_gallery_index') }}
+{% endblock %}
+
+{% block body %}
+
+    <div class="container">
+        <h1>Masonry</h1>
+        <p>test 1</p>
+
+        <h1>Masonry</h1>
+        <p>test 2</p>
+        <button type="button" id="add-item" class="btn btn-main">Add</button>
+
+        <div class="row grid" style="margin-bottom: 10rem; margin-top: 3rem">
+            <div class="grid-sizer"></div>
+            {% for i in 125..133 %}
+                {% if i is even %}
+                    <div class="grid-item col-6 col-md-4 col-xl-3 pb-3 px-2 small">
+                {% else %}
+                    <div class="grid-item col-6 col-md-4 col-xl-3 pb-3 px-2 medium">
+                {% endif %}
+{#                        <img src="{{ 'https://picsum.photos/id/' ~ i ~ '/300/400'}}" alt="">#}
+                        <img src="{{ 'https://source.unsplash.com/random/?fruit&'~i }}" alt="">
+                    </div>
+            {% endfor %}
+                        <div class="grid-item col-6 col-md-4 col-xl-3 pb-3 px-2 small">
+                            <img src="{{ asset('uploads/thumbnails/behelit.jpg') }}" alt="">
+                        </div>
+                        <div class="grid-item col-6 col-md-4 col-xl-3 pb-3 px-2 small">
+                            <img src="{{ asset('uploads/thumbnails/nyan-cat-gif-1.gif') }}" alt="">
+                        </div>
+        </div>
+    </div>
+{% endblock %}

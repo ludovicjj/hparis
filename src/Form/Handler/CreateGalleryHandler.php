@@ -6,6 +6,7 @@ use App\Entity\Gallery;
 use App\Entity\Picture;
 use App\Entity\Thumbnail;
 use App\Repository\CategoryRepository;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
 class CreateGalleryHandler
@@ -26,8 +27,8 @@ class CreateGalleryHandler
         $stateData = $inputBag['state'] ?? '0';
 
         // fileBag
-        $thumbnailData = $fileBag['thumbnail']['imageFile']['file'] ?? null;
-        $uploadsData = $fileBag['uploads'] ?? [];
+        $thumbnailFile = $fileBag['thumbnail']['imageFile']['file'] ?? null;
+        $uploadFiles = $fileBag['uploads'] ?? [];
 
         // title
         $gallery->setTitle($titleData);
@@ -42,17 +43,16 @@ class CreateGalleryHandler
 
         // thumbnail
         $thumbnail = new Thumbnail();
-        if ($thumbnailData) {
-            $thumbnail->setImageFile($thumbnailData);
+        if ($thumbnailFile) {
+            $thumbnail->setImageFile($thumbnailFile);
         }
         $gallery->setThumbnail($thumbnail);
 
         // pictures (uploads)
-        foreach ($uploadsData as $upload) {
-            $uploadedFile = $upload['imageFile']['file'] ?? null;
-            if ($uploadedFile) {
+        foreach ($uploadFiles as $uploadFile) {
+            if ($uploadFile instanceof UploadedFile) {
                 $picture = new Picture();
-                $picture->setImageFile($uploadedFile);
+                $picture->setImageFile($uploadFile);
                 $gallery->addPicture($picture);
             }
         }

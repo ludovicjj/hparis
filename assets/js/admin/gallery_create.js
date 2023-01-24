@@ -1,30 +1,18 @@
 import '../../styles/admin/gallery_create.scss';
-import { CollectionHolder } from "../components/CollectionHolder";
 import { imagePreview } from "../components/image_preview";
 import Swal from 'sweetalert2'
 
 
-
-const collectionHolder = new CollectionHolder({
-    formClassName: '.upload-wrapper',
-    deleteClassName: '.upload-remove',
-    helperClassName: '.upload-help'
-});
-
 class GalleryForm {
-    constructor(form, addUploadBtn) {
+    constructor(form) {
         this.form = form
-        this.addUploadBtn = addUploadBtn;
 
-        this.form.querySelectorAll('input[type="file"]').forEach(input => {
-            input.addEventListener('change', (e) => {
-                imagePreview(e, '.target-preview', '.image_label img')
-            })
+        this.form.querySelector('#thumbnail_imageFile').addEventListener('change', (e) => {
+            imagePreview(e, '.target-preview', '.image_label img')
         })
 
         this.form.addEventListener('submit', this.handleSubmit.bind(this))
         this.form.addEventListener('reset', this.handleReset.bind(this))
-        this.addUploadBtn.addEventListener('click', this.addUploadField)
     }
 
     async handleSubmit(e) {
@@ -34,15 +22,15 @@ class GalleryForm {
         this.removeInvalidFeedback();
         this.removeInvalidStyle();
         this.disableSubmit(true);
-        this.clearEmptyCollection();
 
         const response = await this.send(url, 'POST', new FormData(form))
         this.disableSubmit(false);
 
         if (!response.ok) {
             const errors = await response.json();
-            const transformedErrors = this.transformPropertyErrors(errors.errors)
-            this.displayErrors(transformedErrors)
+            console.log(errors)
+            //const transformedErrors = this.transformPropertyErrors(errors.errors)
+            //this.displayErrors(transformedErrors)
         } else {
             this.form.reset();
             Swal.fire({
@@ -120,47 +108,6 @@ class GalleryForm {
         // Reset thumbnail
         const thumbnail = this.form.querySelector('.thumbnail img');
         thumbnail.setAttribute('src', thumbnail.dataset.origin);
-
-        // remove each upload form into collection
-        const uploadCollection = this.form.querySelector('.uploads-grid');
-        uploadCollection.querySelectorAll('.upload-wrapper').forEach(upload => {
-            uploadCollection.removeChild(upload);
-        })
-
-        // display upload help
-        const helper = uploadCollection.querySelector('.upload-help');
-        helper.animate([
-            {
-                transform: 'translate(170px)',
-                opacity: 0
-            },
-            {
-                transform: 'none',
-                opacity: 1
-            },
-        ], {
-            duration: 400,
-            easing: 'ease-in-out',
-            fill: 'both'
-        });
-        window.setTimeout(_ => {
-            helper.classList.remove('hidden');
-        }, 400)
-    }
-
-    clearEmptyCollection() {
-        const uploadCollection = this.form.querySelector('.uploads-grid');
-
-        uploadCollection.querySelectorAll('input[type="file"]').forEach(inputFileUploads => {
-            if (!inputFileUploads.files.length) {
-                let upload = inputFileUploads.closest('.upload-wrapper');
-                upload.parentNode.removeChild(upload);
-            }
-        })
-    }
-
-    addUploadField(e) {
-        collectionHolder.addFormToCollection(e)
     }
 
     /**
@@ -210,5 +157,135 @@ class GalleryForm {
     }
 }
 const form = document.querySelector('#form-gallery');
-const addUploadBtn = document.querySelector('#new-upload');
-new GalleryForm(form, addUploadBtn)
+const uploadDropArea = form.querySelector('.upload-drop-area');
+const uploadInput = uploadDropArea.querySelector('#uploads');
+const uploadBtn = uploadDropArea.querySelector('.upload-drop-area_btn');
+const uploadInfo = uploadDropArea.querySelector('.upload-drop-area_info');
+const uploadAdd = uploadDropArea.querySelector('.upload-drop-area_btn__add');
+let dragCounter = 0;
+let files;
+
+uploadBtn.addEventListener('click', () => {
+    uploadInput.click();
+})
+
+// upload file change
+uploadInput.addEventListener('change', (e) => {
+    const uploadsField = e.currentTarget;
+    const files = uploadsField.files;
+    console.log(files);
+})
+
+// user drag file enter into area
+uploadDropArea.addEventListener('dragenter', (e) => {
+    dragCounter++;
+    let dropzone = e.currentTarget
+    dropzone.classList.add('active')
+
+    uploadBtn.animate([
+        {transform: 'scale(1,1)'},
+        {transform: 'scale(1.2,1.2)', marginBottom:'12px', marginTop: '12px'},
+    ], {
+        duration: 300,
+        easing: 'ease-in-out',
+        fill: 'both'
+    })
+    uploadAdd.animate([
+        {transform: 'rotate(0deg)'},
+        {transform: 'rotate(180deg)'},
+    ], {
+        duration: 400,
+        easing: 'ease-in-out',
+        fill: 'both'
+    })
+    
+})
+
+uploadDropArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+})
+
+// user drag file out area
+uploadDropArea.addEventListener('dragleave', (e) => {
+    dragCounter--;
+    if (dragCounter === 0) {
+        e.currentTarget.classList.remove('active')
+    }
+    uploadBtn.animate([
+        {transform: 'scale(1.2,1.2)', marginBottom:'12px', marginTop: '12px'},
+        {transform: 'scale(1,1)', marginBottom:'0', marginTop: '0'}
+    ], {
+        duration: 300,
+        easing: 'ease-in-out',
+        fill: 'both'
+    })
+})
+
+// user drop file on area
+uploadDropArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadAdd.animate([
+        {transform: 'rotate(180deg)'},
+        {transform: 'rotate(0deg)'},
+    ], {
+        duration: 400,
+        easing: 'ease-in-out',
+        fill: 'both'
+    })
+    uploadBtn.animate([
+        {transform: 'scale(1.2,1.2)', marginBottom:'12px', marginTop: '12px'},
+        {transform: 'scale(1,1)', marginBottom:'0', marginTop: '0'}
+    ], {
+        duration: 300,
+        easing: 'ease-in-out',
+        fill: 'both'
+    })
+
+    files = e.dataTransfer.files
+    let filesArray = [...files];
+    const fileNumber = filesArray.length;
+
+    // test extension
+    let validTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
+    let validResultType = false;
+
+    for (const file of filesArray) {
+        const fileType = file.type
+        if (!validTypes.includes(fileType)) {
+            validResultType = false
+            break;
+        }
+        validResultType = true
+    }
+
+    if (!validResultType) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erreur',
+            text: 'Seuls les fichiers JPG, PNG et GIF sont autorisés.',
+            confirmButtonColor: '#DC3545FF',
+            confirmButtonText: 'ok'
+        })
+        uploadInput.value = null;
+        resetInfoUpload();
+    } else {
+        updateInfoUpload(fileNumber);
+        uploadInput.files = files
+    }
+    dragCounter = 0
+    e.currentTarget.classList.remove('active')
+})
+
+const updateInfoUpload = (fileNumber = null, message = null) => {
+    if (fileNumber) {
+        uploadInfo.innerText = `Vous avez sélectionné ${fileNumber} fichier${fileNumber > 1 ?'s' : ''}`;
+    } else {
+        uploadInfo.innerText = message;
+    }
+
+}
+const resetInfoUpload = () => {
+    uploadInfo.innerText = "Glisser et déposer vos fichiers ici"
+}
+
+new GalleryForm(form)
