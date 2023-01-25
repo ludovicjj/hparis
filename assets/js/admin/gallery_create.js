@@ -23,14 +23,21 @@ class GalleryForm {
         this.removeInvalidStyle();
         this.disableSubmit(true);
 
-        const response = await this.send(url, 'POST', new FormData(form))
+        const formData = new FormData(form)
+
+        // fetch all uploaded pictures from dropbox
+        Array.from(this.form.querySelectorAll('.upload-info-item')).forEach(uploadedItem => {
+            formData.append('uploads[]', uploadedItem.dataset.pictureId);
+        });
+        const response = await this.send(url, 'POST', formData);
+
         this.disableSubmit(false);
 
         if (!response.ok) {
             const errors = await response.json();
-            console.log(errors)
-            //const transformedErrors = this.transformPropertyErrors(errors.errors)
-            //this.displayErrors(transformedErrors)
+            // console.log(errors)
+            const transformedErrors = this.transformPropertyErrors(errors.errors)
+            this.displayErrors(transformedErrors)
         } else {
             this.form.reset();
             Swal.fire({
@@ -44,16 +51,9 @@ class GalleryForm {
     }
 
     displayErrors(errors) {
-        const UploadCollectionHolder = this.form.querySelector('.uploads-grid');
-        const uploadForms = Array.from(UploadCollectionHolder.querySelectorAll('.upload-wrapper'));
 
         errors.forEach(error => {
-            let field;
-            if (error?.type === "collection") {
-                field = uploadForms[error.position];
-            } else {
-                field = document.querySelector(`input[name="${error.property}"]`)
-            }
+            let field = document.querySelector(`input[name="${error.property}"]`)
 
             if (field) {
                 field.classList.add('is-invalid');
@@ -81,19 +81,11 @@ class GalleryForm {
             // transform property to match with field name
             if (property.includes('.')) {
                 property = property
-                    .replace('pictures', 'uploads')
                     .replace(regex, (match, field, child) => {
                         return field ? field : "[" + child.slice(1) + "]"
                     })
                 error.property = property + '[file]';
                 error.parentClass = 'target-preview'
-            }
-
-            // collection
-            if (property.startsWith('uploads')) {
-                let position = error.property.match(/\d+/)
-                error.type = 'collection';
-                error.position = position[0]
             }
 
             return error;
@@ -158,12 +150,10 @@ class GalleryForm {
 }
 const form = document.querySelector('#form-gallery');
 const uploadDropArea = form.querySelector('.upload-drop-area');
+const uploadItemArea = form.querySelector('.upload-info-items');
 const uploadInput = uploadDropArea.querySelector('#uploads');
-const uploadBtn = uploadDropArea.querySelector('.upload-drop-area_btn');
-const uploadInfo = uploadDropArea.querySelector('.upload-drop-area_info');
-const uploadAdd = uploadDropArea.querySelector('.upload-drop-area_btn__add');
+const uploadBtn = form.querySelector('.upload-drop_add')
 let dragCounter = 0;
-let files;
 
 uploadBtn.addEventListener('click', () => {
     uploadInput.click();
@@ -171,9 +161,12 @@ uploadBtn.addEventListener('click', () => {
 
 // upload file change
 uploadInput.addEventListener('change', (e) => {
-    const uploadsField = e.currentTarget;
-    const files = uploadsField.files;
-    console.log(files);
+    let [...files] = e.currentTarget.files;
+    let index = 0;
+    let nbItemLoaded = uploadItemArea.childElementCount;
+
+    uploadDom(files, uploadItemArea)
+    upload(files, index, uploadItemArea, nbItemLoaded)
 })
 
 // user drag file enter into area
@@ -181,24 +174,6 @@ uploadDropArea.addEventListener('dragenter', (e) => {
     dragCounter++;
     let dropzone = e.currentTarget
     dropzone.classList.add('active')
-
-    uploadBtn.animate([
-        {transform: 'scale(1,1)'},
-        {transform: 'scale(1.2,1.2)', marginBottom:'12px', marginTop: '12px'},
-    ], {
-        duration: 300,
-        easing: 'ease-in-out',
-        fill: 'both'
-    })
-    uploadAdd.animate([
-        {transform: 'rotate(0deg)'},
-        {transform: 'rotate(180deg)'},
-    ], {
-        duration: 400,
-        easing: 'ease-in-out',
-        fill: 'both'
-    })
-    
 })
 
 uploadDropArea.addEventListener('dragover', (e) => {
@@ -211,81 +186,103 @@ uploadDropArea.addEventListener('dragleave', (e) => {
     if (dragCounter === 0) {
         e.currentTarget.classList.remove('active')
     }
-    uploadBtn.animate([
-        {transform: 'scale(1.2,1.2)', marginBottom:'12px', marginTop: '12px'},
-        {transform: 'scale(1,1)', marginBottom:'0', marginTop: '0'}
-    ], {
-        duration: 300,
-        easing: 'ease-in-out',
-        fill: 'both'
-    })
 })
 
+function uploadDom(files, area) {
+    files.forEach(file => {
+        let fileName = file.name;
+        let size = (file.size / 1000).toFixed(1); // getting file size in KB from bytes
+        let fileSize = (size < 1000) ? `${size} KB` : `${(size/1000).toFixed(1)} MB`
+
+        // make fragment
+        let html = `<li class="upload-info-item">
+                        <div class="icon-file">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="upload-item-content">
+                            <div class="file-name">${fileName}</div>
+                            <div class="d-flex">
+                                <div class="file-size form-text">${fileSize}</div>
+                                <div class="file-error flex-grow-1 form-text">
+                                    <p class="mb-0 text-end"></p>
+                                </div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress"></div>
+                            </div>
+                        </div>
+                        <div class="icon-state loading"></div>
+                        <div class="icon-remove">
+                            <i class="fa-solid fa-xmark"></i>
+                        </div>
+                    </li>`
+        area.innerHTML += html
+    })
+}
+function upload(files, index, area, nbItemLoaded) {
+    let file = files[index];
+    let position = index + nbItemLoaded;
+
+    const xhr = new XMLHttpRequest();
+    const formData = new FormData();
+    formData.append('upload', file);
+
+    const items = Array.from(area.querySelectorAll('.upload-info-item'));
+
+    const currentItem = items[position];
+    const itemProgress = currentItem.querySelector('.progress');
+    const itemState = currentItem.querySelector('.icon-state');
+
+    // request progress
+    xhr.upload.addEventListener("progress", ({loaded, total}) => {
+        let fileProgress = Math.floor((loaded / total) * 100);
+        itemProgress.style.width = fileProgress + '%';
+    })
+
+    // request completed
+    xhr.addEventListener("load", () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+            itemState.classList.remove('loading');
+            itemState.classList.add('success');
+            let data = JSON.parse(xhr.responseText);
+            currentItem.dataset.pictureId = data.id;
+            currentItem.classList.add('valid-file')
+
+        } else {
+            let data = JSON.parse(xhr.responseText);
+            let errors = data.errors;
+
+            const itemErrorContainer = currentItem.querySelector('.file-error > p')
+            for (const error of errors) {
+                itemErrorContainer.innerText = error.message;
+            }
+
+            itemState.classList.remove('loading');
+            itemState.classList.add('failed');
+            currentItem.classList.add('invalid-file')
+        }
+
+        if (index < files.length - 1) {
+            upload(files, index+1, area, nbItemLoaded)
+        }
+    })
+
+    xhr.open("POST", '/api/pictures', true)
+    xhr.withCredentials = true;
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest")
+    xhr.send(formData)
+}
 // user drop file on area
 uploadDropArea.addEventListener('drop', (e) => {
     e.preventDefault();
-    uploadAdd.animate([
-        {transform: 'rotate(180deg)'},
-        {transform: 'rotate(0deg)'},
-    ], {
-        duration: 400,
-        easing: 'ease-in-out',
-        fill: 'both'
-    })
-    uploadBtn.animate([
-        {transform: 'scale(1.2,1.2)', marginBottom:'12px', marginTop: '12px'},
-        {transform: 'scale(1,1)', marginBottom:'0', marginTop: '0'}
-    ], {
-        duration: 300,
-        easing: 'ease-in-out',
-        fill: 'both'
-    })
+    dragCounter = 0;
+    let [...files] = e.dataTransfer.files;
+    let index = 0;
+    let nbItemLoaded = uploadItemArea.childElementCount;
 
-    files = e.dataTransfer.files
-    let filesArray = [...files];
-    const fileNumber = filesArray.length;
-
-    // test extension
-    let validTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
-    let validResultType = false;
-
-    for (const file of filesArray) {
-        const fileType = file.type
-        if (!validTypes.includes(fileType)) {
-            validResultType = false
-            break;
-        }
-        validResultType = true
-    }
-
-    if (!validResultType) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Erreur',
-            text: 'Seuls les fichiers JPG, PNG et GIF sont autorisés.',
-            confirmButtonColor: '#DC3545FF',
-            confirmButtonText: 'ok'
-        })
-        uploadInput.value = null;
-        resetInfoUpload();
-    } else {
-        updateInfoUpload(fileNumber);
-        uploadInput.files = files
-    }
-    dragCounter = 0
+    uploadDom(files, uploadItemArea)
+    upload(files, index, uploadItemArea, nbItemLoaded)
     e.currentTarget.classList.remove('active')
 })
-
-const updateInfoUpload = (fileNumber = null, message = null) => {
-    if (fileNumber) {
-        uploadInfo.innerText = `Vous avez sélectionné ${fileNumber} fichier${fileNumber > 1 ?'s' : ''}`;
-    } else {
-        uploadInfo.innerText = message;
-    }
-
-}
-const resetInfoUpload = () => {
-    uploadInfo.innerText = "Glisser et déposer vos fichiers ici"
-}
 
 new GalleryForm(form)

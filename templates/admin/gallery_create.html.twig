@@ -50,6 +50,48 @@
                             {{ form_help(form.state) }}
                             {{ form_errors(form.state) }}
                         </div>
+
+                        <div class="uploads-container">
+                            <p class="mb-0">Télécharger</p>
+                            <div id="upload_help" class="form-text mb-1 help-text">Ajouter vos images à la galerie</div>
+
+                            <div class="upload-drop-area mb-4">
+                                <button type="button" class="btn upload-drop_add">
+                                    <i class="fa-solid fa-folder-open"></i>
+                                    <span class="icon-more">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </span>
+                                </button>
+                                <span class="upload-help">Glisser et déposer vos fichiers ici</span>
+                                {{ form_widget(form.uploads) }}
+                            </div>
+
+                            <ul class="upload-info-items px-0">
+{#                                <li class="upload-info-item">#}
+{#                                    <div class="icon-file">#}
+{#                                        <i class="fas fa-file-alt"></i>#}
+{#                                    </div>#}
+{#                                    <div class="upload-item-content">#}
+{#                                        <div class="file-name">image-1.png</div>#}
+{#                                        <div class="d-flex">#}
+{#                                            <div class="file-size form-text">70 KB</div>#}
+{#                                            <div class="file-error flex-grow-1">#}
+{#                                                <p class="form-text mb-0 text-end">Seuls les fichiers JPG, PNG et GIF sont autorisés.</p>#}
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                        <div class="progress-bar">#}
+{#                                            <div class="progress"></div>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                    <div class="icon-state failed"></div>#}
+{#                                    <div class="icon-remove">#}
+{#                                        <i class="fa-solid fa-xmark"></i>#}
+{#                                    </div>#}
+{#                                </li>#}
+                            </ul>
+                        </div>
+
+
                     </div>
                     <div class="grid-item-right">
                         <hr class="border border-1 opacity-50 d-block d-lg-none">
@@ -62,21 +104,6 @@
                             {% endfor %}
                         </div>
                     </div>
-                </div>
-                <div class="uploads-container mb-3">
-                    <p class="mb-0">Télécharger</p>
-                    <div id="state_help" class="form-text mb-1 help-text">Ajouter vos images à la galerie</div>
-                    <div class="upload-drop-area">
-                        <button type="button" class="btn upload-drop-area_btn">
-                            <i class="fa-solid fa-folder-open"></i>
-                            <span class="upload-drop-area_btn__add">
-                                <i class="fa-solid fa-plus"></i>
-                            </span>
-                        </button>
-                        <span class="upload-drop-area_info">Glisser et déposer vos fichiers ici</span>
-                        {{ form_widget(form.uploads) }}
-                    </div>
-
                 </div>
                 {{ form_row(form.submit) }}
                 {{ form_end(form) }}

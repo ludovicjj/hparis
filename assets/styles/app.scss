@@ -5,11 +5,15 @@
 :root {
     --main-color: #4869ee;
     --main-dark-color: #3c5be3;
+    --main-light-color: #e1e9ff;
+    --main-extra-light-color: #fbfbff;
     --main-dark-color-rgba: rgba(60,91,227,.5);
     --breadcrumb-color: #effbec;
     --box-shadow-rgba: rgba(17, 1, 68, 0.08);
     --hamburger-color: #333;
     --invalid-color: #dc3545;
+    --invalid-text-color: #b02a37;
+    --success-color: #329332;
 }
 
 /** page-wrapper **/

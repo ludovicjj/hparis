@@ -23,20 +23,13 @@
 .target-preview {
     position: relative;
 }
-//input[type="file"] {
-//    position: absolute;
-//    left: 0;
-//    top: 50%;
-//    pointer-events: none;
-//    opacity: 0;
-//}
 input[type="file"]:focus + label {
     box-shadow: 0 0 0 0.25rem #c4dbf9;
 }
 // Image Label
 .upload .image_label,
 .thumbnail .image_label {
-    background-color: #FFFFFF;
+    background-color: #fff;
     border-radius: 8px;
     cursor: pointer;
     box-shadow: 0 0 25px var(--box-shadow-rgba);
@@ -56,6 +49,13 @@ input[type="file"]:focus + label {
 }
 
 // Thumbnail
+#thumbnail_imageFile {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    pointer-events: none;
+    opacity: 0;
+}
 .thumbnail {
     display: flex;
     flex-direction: column;
@@ -76,7 +76,7 @@ input[type="file"]:focus + label {
 
 // Uploads
 .upload-drop-area {
-    border: dashed 2px var(--main-dark-color);
+    border: dashed 2px var(--main-light-color);
     padding: .625rem;
     min-height: 150px;
 
@@ -85,57 +85,155 @@ input[type="file"]:focus + label {
     justify-content: center;
     align-items: center;
     border-radius: .5rem;
-    background-color: #fbfbff;
+    background-color: var(--main-extra-light-color);
     transition: background-color .3s;
+
+    & button.upload-drop_add {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        font-size: 2rem;
+        background-color: var(--main-light-color);
+        color: var(--main-color);
+        &:hover,
+        &:active {
+            background-color: rgba(172, 187, 248, 0.4);
+            color: var(--main-dark-color);
+        }
+        &:focus-visible {
+            box-shadow: 0 0 0 0.25rem #c4dbf9;
+        }
+
+        & .icon-more {
+            position: absolute;
+            left: 41px;
+            top: 41px;
+            width: 1.2rem;
+            height: 1.2rem;
+            background-color: #fff;
+            border-radius: 50%;
+            font-size: .8rem;
+            color: var(--main-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    }
 }
 .upload-drop-area.active {
     background-color: rgba(60,91,227,.3);
 }
-.upload-drop-area_btn {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    font-size: 2rem;
-    position: relative;
-    background-color: #e1e9ff;
-    color: var(--main-color)
-}
-.upload-drop-area_btn:hover,
-.upload-drop-area_btn:active,
-.upload-drop-area_btn:focus-visible {
-    background-color: rgba(172, 187, 248, 0.4) !important;
-    color: var(--main-dark-color) !important;
-}
-.upload-drop-area_btn:focus-visible {
-    box-shadow: 0 0 0 0.25rem #c4dbf9;
-}
-.upload-drop-area_btn__add {
-    position: absolute;
-    left: 41px;
-    top: 41px;
-    width: 1.2rem;
-    height: 1.2rem;
-    background-color: #fff;
-    border-radius: 50%;
-    font-size: .8rem;
-    color: var(--main-color);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.upload-drop-area_info {
+.upload-help {
     font-size: 1rem;
     color: var(--main-color);
     transition: color .3s;
 }
-.upload-drop-area.active .upload-drop-area_info{
+.upload-drop-area.active .upload-help {
     color: var(--main-dark-color);
 }
+// Uploads file info
+.upload-info-items {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    max-height: 232px;
+    overflow-y: auto;
+}
+.upload-info-items > .upload-info-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    flex-wrap: nowrap;
+    gap: .5rem;
+
+    border: solid 1px var(--main-light-color);
+    border-radius: .5rem;
+    padding: .5rem;
+    & .icon-file,
+    & .icon-state,
+    & .icon-remove {
+        text-align: center;
+        flex: 0 0 auto;
+    }
+    &.invalid-file {
+        .progress {
+            background-color: var(--invalid-color);
+        }
+    }
+    &.valid-file {
+        .progress {
+            background-color: var(--success-color);
+        }
+    }
+    .progress-bar {
+        height: 4px;
+        background-color: var(--main-light-color);
+        border-radius: 4px;
+    }
+    .progress {
+        background-color: #4e88ec;
+        transition: background-color 1s ease-in-out;
+        width: 0;
+    }
+    & .icon-file {
+        height: 50px;
+        width: 50px;
+
+        line-height: 50px;
+        border-radius: 50%;
+
+        font-size: 1.5rem;
+        background-color: var(--main-light-color);
+        color: var(--main-color);
+    }
+    & .upload-item-content {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        & .file-error > p {
+            color: var(--invalid-text-color);
+        }
+    }
+    & .icon-state{
+        &.success {
+            background: var(--success-color) url('../../images/check.svg') center no-repeat;
+            background-size: 1rem;
+        }
+        &.loading {
+            background: url('../../images/loader.svg') center / contain no-repeat;
+        }
+        &.failed {
+            background-color: var(--invalid-color);
+            background-image: url('../../images/ban.svg');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: 1rem;
+        }
+        height: 30px;
+        width: 30px;
+        line-height: 30px;
+        border-radius: 50%;
+        background-color: #fff;
+        transition: background-color .4s ease-in-out;
+    }
+    & .icon-remove {
+        height: 50px;
+        width: 50px;
+        line-height: 50px;
+        color: rgba(33, 37, 41, 0.5);
+        &:hover {
+            color: var(--invalid-color);
+        }
+    }
+}
+
 @media (min-width: 576px) {
     .thumbnail .image_label {
         width: 74%;
@@ -147,9 +245,6 @@ input[type="file"]:focus + label {
         width: 55%;
         height: 350px;
     }
-    .uploads-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
 }
 @media (min-width: 992px) {
     .thumbnail .image_label {
@@ -159,11 +254,6 @@ input[type="file"]:focus + label {
     }
     .thumbnail .help-text{
         text-align: left;
-    }
-
-    .upload-item .image_label {
-        width: 100%;
-        height: 210px;
     }
 
     .gallery-form-grid {
@@ -179,10 +269,5 @@ input[type="file"]:focus + label {
     #submit {
         display: inline-block;
         width: auto;
-    }
-}
-@media (min-width: 1200px) {
-    .uploads-grid {
-        grid-template-columns: repeat(5, 1fr);
     }
 }

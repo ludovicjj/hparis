@@ -21,6 +21,7 @@ class Thumbnail
     #[Assert\NotBlank(message: "Vous devez choisir une image à la une.")]
     #[Assert\File(
         maxSize: '1024k',
+        maxSizeMessage: 'Fichier trop volumineux ({{ size }} {{ suffix }}). Maximum autorisée {{ limit }} {{ suffix }}.',
         extensions: [
 //            'jpg' => 'image/jpeg',
             'png' => 'image/png',

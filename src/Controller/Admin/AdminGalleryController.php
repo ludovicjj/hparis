@@ -4,9 +4,12 @@ namespace App\Controller\Admin;
 
 use App\Builder\ErrorsValidationBuilder;
 use App\Entity\Gallery;
+use App\Entity\Picture;
 use App\Form\Handler\CreateGalleryHandler;
 use App\Form\Type\GalleryType;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +29,8 @@ class AdminGalleryController extends AbstractController
     public function create(
         Request $request,
         CreateGalleryHandler $galleryHandler,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        EntityManagerInterface $em
     ): Response
     {
         $form = $this->createForm(GalleryType::class, new Gallery(), [
@@ -35,8 +39,6 @@ class AdminGalleryController extends AbstractController
 
         if ($request->isXmlHttpRequest() && $request->isMethod('POST')) {
             $gallery = $galleryHandler->handle($request);
-            dd($gallery);
-
             $constraintList = $validator->validate($gallery);
             ErrorsValidationBuilder::buildErrors($constraintList);
 

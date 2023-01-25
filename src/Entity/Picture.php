@@ -20,12 +20,13 @@ class Picture
     #[Vich\UploadableField(mapping: 'picture_images', fileNameProperty: 'imageName', size: 'imageSize', originalName: 'originalName')]
     #[Assert\File(
         maxSize: '1024k',
+        maxSizeMessage: 'Fichier trop volumineux ({{ size }} {{ suffix }}). Maximum autorisée {{ limit }} {{ suffix }}.',
         extensions: [
 //            'jpg' => 'image/jpeg',
             'png' => 'image/png',
             'gif' => 'image/gif'
         ],
-        extensionsMessage: 'Seuls les fichiers JPG, PNG et GIF sont autorisés.',
+        extensionsMessage: 'Seuls les fichiers JPG, PNG et GIF sont autorisés.'
     )]
     private ?File $imageFile = null;
 
