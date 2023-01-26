@@ -39,6 +39,15 @@ class PictureRepository extends ServiceEntityRepository
         }
     }
 
+    public function findPendingPicture(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.isPending = :pending')
+            ->setParameter('pending', true)
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Picture[] Returns an array of Picture objects
 //     */

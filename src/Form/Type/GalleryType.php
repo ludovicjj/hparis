@@ -4,19 +4,21 @@ namespace App\Form\Type;
 
 use App\Entity\Category;
 use App\Entity\Gallery;
-use App\Entity\Picture;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class GalleryType extends AbstractType
 {
+    public function __construct(private UrlGeneratorInterface $urlGenerator)
+    {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -31,24 +33,17 @@ class GalleryType extends AbstractType
                 'required' => false,
                 'help' => 'form.gallery.state.help',
             ])
-            ->add('category', EntityType::class, [
+            ->add('categories', CategoryType::class, [
                 'class' => Category::class,
                 'label' => 'form.gallery.category.label',
                 'help' => 'form.gallery.category.help',
-                'placeholder' => 'form.gallery.category.placeholder',
-                'multiple' => false,
-                'expanded' => false,
-                'required' => false,
-                'choice_label' => function (Category $category) {
-                    return $category->getName();
-                }
+                'search' => $this->urlGenerator->generate('api_category_search')
             ])
             ->add('thumbnail', ThumbnailType::class, [
                 'label' => false
             ])
             ->add("uploads", FileType::class, [
-                "mapped" => false,
-                //'label' => 'form.gallery.uploads.label',
+                'mapped' => false,
                 'label' => false,
                 'multiple' => true,
                 'attr' => [

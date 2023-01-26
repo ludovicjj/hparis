@@ -22,7 +22,7 @@ class Picture
         maxSize: '1024k',
         maxSizeMessage: 'Fichier trop volumineux ({{ size }} {{ suffix }}). Maximum autorisée {{ limit }} {{ suffix }}.',
         extensions: [
-//            'jpg' => 'image/jpeg',
+            'jpg' => 'image/jpeg',
             'png' => 'image/png',
             'gif' => 'image/gif'
         ],
@@ -41,6 +41,9 @@ class Picture
 
     #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $updatedAt = null;
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private ?bool $isPending = null;
 
     public function getId(): ?int
     {
@@ -101,5 +104,15 @@ class Picture
     {
 
         return $this->updatedAt;
+    }
+
+    public function setIsPending(bool $isPending): void
+    {
+        $this->isPending = $isPending;
+    }
+
+    public function getIsPending(): ?bool
+    {
+        return $this->isPending;
     }
 }

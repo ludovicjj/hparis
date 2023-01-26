@@ -3,15 +3,17 @@
 namespace App\Form\Handler;
 
 use App\Entity\Gallery;
-use App\Entity\Picture;
 use App\Entity\Thumbnail;
 use App\Repository\CategoryRepository;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use App\Repository\PictureRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 class CreateGalleryHandler
 {
-    public function __construct(private CategoryRepository $categoryRepository)
+    public function __construct(
+        private CategoryRepository $categoryRepository,
+        private PictureRepository $pictureRepository
+    )
     {
     }
 
@@ -23,23 +25,34 @@ class CreateGalleryHandler
 
         // inputBag
         $titleData = $inputBag['title'] ?? null;
-        $categoryData = $inputBag['category'] ?? null;
+        $categoryId = $inputBag['categories'] ?? [];
         $stateData = $inputBag['state'] ?? '0';
+        $uploadedPictureId = $inputBag['uploads'] ?? [];
 
         // fileBag
         $thumbnailFile = $fileBag['thumbnail']['imageFile']['file'] ?? null;
-        $uploadFiles = $fileBag['uploads'] ?? [];
 
         // title
         $gallery->setTitle($titleData);
 
         // category
-        if ($categoryData) {
-            $category = $this->categoryRepository->find($categoryData);
-            $gallery->setCategory($category);
+        foreach ($categoryId as $id) {
+            $category = $this->categoryRepository->find($id);
+            if ($category) {
+                $gallery->addCategory($category);
+            }
         }
         // state
         $gallery->setState($stateData === '1');
+
+        // upload
+        foreach ($uploadedPictureId as $id) {
+            $picture = $this->pictureRepository->find($id);
+            if ($picture && $picture->getIsPending() === true) {
+                $picture->setIsPending(false);
+                $gallery->addPicture($picture);
+            }
+        }
 
         // thumbnail
         $thumbnail = new Thumbnail();
@@ -47,15 +60,6 @@ class CreateGalleryHandler
             $thumbnail->setImageFile($thumbnailFile);
         }
         $gallery->setThumbnail($thumbnail);
-
-        // pictures (uploads)
-        foreach ($uploadFiles as $uploadFile) {
-            if ($uploadFile instanceof UploadedFile) {
-                $picture = new Picture();
-                $picture->setImageFile($uploadFile);
-                $gallery->addPicture($picture);
-            }
-        }
 
         return $gallery;
     }

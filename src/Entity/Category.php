@@ -18,7 +18,7 @@ class Category
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Gallery::class)]
+    #[ORM\ManyToMany(targetEntity: Gallery::class, mappedBy: 'categories')]
     private Collection $galleries;
 
     public function __construct()
@@ -55,7 +55,7 @@ class Category
     {
         if (!$this->galleries->contains($gallery)) {
             $this->galleries->add($gallery);
-            $gallery->setCategory($this);
+            $gallery->addCategory($this);
         }
 
         return $this;
@@ -64,10 +64,7 @@ class Category
     public function removeGallery(Gallery $gallery): self
     {
         if ($this->galleries->removeElement($gallery)) {
-            // set the owning side to null (unless already changed)
-            if ($gallery->getCategory() === $this) {
-                $gallery->setCategory(null);
-            }
+            $gallery->removeCategory($this);
         }
 
         return $this;

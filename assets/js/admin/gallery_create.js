@@ -1,6 +1,38 @@
+import TomSelect from "tom-select/dist/js/tom-select.complete.min";
 import '../../styles/admin/gallery_create.scss';
 import { imagePreview } from "../components/image_preview";
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
+
+//categories
+async function onLoad(url) {
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json'
+        }
+    })
+    if (response.status === 204) {
+        return null;
+    }
+    return await response.json();
+}
+const categoryField = document.querySelector('#categories');
+categoryField.classList.remove('form-select')
+new TomSelect('#categories', {
+    hideSelected: true,
+    closeAfterSelect: true,
+    valueField: categoryField.dataset.value,
+    labelField: categoryField.dataset.label,
+    searchField: categoryField.dataset.label,
+    placeholder: 'Recherchez une catégorie',
+    load: async (query, callback) => {
+        const url = `${categoryField.dataset.remote}?s=${encodeURIComponent(query)}`;
+        callback(await onLoad(url))
+    },
+    plugins: {
+        remove_button: {title: 'Supprimer cette catégorie'}
+    }
+})
 
 
 class GalleryForm {
@@ -27,7 +59,9 @@ class GalleryForm {
 
         // fetch all uploaded pictures from dropbox
         Array.from(this.form.querySelectorAll('.upload-info-item')).forEach(uploadedItem => {
-            formData.append('uploads[]', uploadedItem.dataset.pictureId);
+            if (uploadedItem.dataset.pictureId) {
+                formData.append('uploads[]', uploadedItem.dataset.pictureId);
+            }
         });
         const response = await this.send(url, 'POST', formData);
 
@@ -35,12 +69,11 @@ class GalleryForm {
 
         if (!response.ok) {
             const errors = await response.json();
-            // console.log(errors)
             const transformedErrors = this.transformPropertyErrors(errors.errors)
             this.displayErrors(transformedErrors)
         } else {
             this.form.reset();
-            Swal.fire({
+            await Swal.fire({
                 icon: 'success',
                 title: 'Bravo',
                 text: 'Votre galerie a été créée avec success !',
@@ -100,6 +133,10 @@ class GalleryForm {
         // Reset thumbnail
         const thumbnail = this.form.querySelector('.thumbnail img');
         thumbnail.setAttribute('src', thumbnail.dataset.origin);
+
+        // clear Uploaded files area
+        const uploadPictureFiles = this.form.querySelector('.upload-info-items');
+        uploadPictureFiles.replaceChildren();
     }
 
     /**
@@ -148,7 +185,11 @@ class GalleryForm {
         })
     }
 }
+
 const form = document.querySelector('#form-gallery');
+new GalleryForm(form);
+
+
 const uploadDropArea = form.querySelector('.upload-drop-area');
 const uploadItemArea = form.querySelector('.upload-info-items');
 const uploadInput = uploadDropArea.querySelector('#uploads');
@@ -160,20 +201,22 @@ uploadBtn.addEventListener('click', () => {
 })
 
 // upload file change
-uploadInput.addEventListener('change', (e) => {
-    let [...files] = e.currentTarget.files;
+uploadInput.addEventListener('change', function () {
+    let [...files] = this.files;
     let index = 0;
     let nbItemLoaded = uploadItemArea.childElementCount;
 
     uploadDom(files, uploadItemArea)
     upload(files, index, uploadItemArea, nbItemLoaded)
+
+    // reset input file
+    this.value = null;
 })
 
 // user drag file enter into area
-uploadDropArea.addEventListener('dragenter', (e) => {
+uploadDropArea.addEventListener('dragenter', function () {
     dragCounter++;
-    let dropzone = e.currentTarget
-    dropzone.classList.add('active')
+    this.classList.add('active')
 })
 
 uploadDropArea.addEventListener('dragover', (e) => {
@@ -181,10 +224,10 @@ uploadDropArea.addEventListener('dragover', (e) => {
 })
 
 // user drag file out area
-uploadDropArea.addEventListener('dragleave', (e) => {
+uploadDropArea.addEventListener('dragleave', function ()  {
     dragCounter--;
     if (dragCounter === 0) {
-        e.currentTarget.classList.remove('active')
+        this.classList.remove('active')
     }
 })
 
@@ -222,6 +265,7 @@ function uploadDom(files, area) {
 function upload(files, index, area, nbItemLoaded) {
     let file = files[index];
     let position = index + nbItemLoaded;
+    const url = area.dataset.url
 
     const xhr = new XMLHttpRequest();
     const formData = new FormData();
@@ -267,13 +311,13 @@ function upload(files, index, area, nbItemLoaded) {
         }
     })
 
-    xhr.open("POST", '/api/pictures', true)
+    xhr.open("POST", url, true)
     xhr.withCredentials = true;
     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest")
     xhr.send(formData)
 }
 // user drop file on area
-uploadDropArea.addEventListener('drop', (e) => {
+uploadDropArea.addEventListener('drop', function (e) {
     e.preventDefault();
     dragCounter = 0;
     let [...files] = e.dataTransfer.files;
@@ -282,7 +326,5 @@ uploadDropArea.addEventListener('drop', (e) => {
 
     uploadDom(files, uploadItemArea)
     upload(files, index, uploadItemArea, nbItemLoaded)
-    e.currentTarget.classList.remove('active')
+    this.classList.remove('active')
 })
-
-new GalleryForm(form)

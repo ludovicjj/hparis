@@ -1,3 +1,4 @@
+@import "~tom-select/src/scss/tom-select";
 @import "../components/custom_checkbox";
 @import '../components/header_wave';
 @import "../components/footer_wave";
@@ -17,6 +18,16 @@
 #submit {
     display: block;
     width: 100%;
+}
+
+// category
+#categories {
+    height: 36px;
+    overflow: hidden;
+}
+.ts-control {
+    border-radius: 0.375rem;
+    border-color: #dee2e6;
 }
 
 // input File

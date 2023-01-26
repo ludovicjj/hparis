@@ -38,10 +38,10 @@
                             {{ form_errors(form.title) }}
                         </div>
                         <div class="mb-3 category">
-                            {{ form_label(form.category) }}
-                            {{ form_widget(form.category) }}
-                            {{ form_help(form.category) }}
-                            {{ form_errors(form.category) }}
+                            {{ form_label(form.categories) }}
+                            {{ form_widget(form.categories) }}
+                            {{ form_help(form.categories) }}
+                            {{ form_errors(form.categories) }}
                         </div>
                         <div class="mb-3 state">
                             <div class="form-label">Visibilité</div>
@@ -66,7 +66,7 @@
                                 {{ form_widget(form.uploads) }}
                             </div>
 
-                            <ul class="upload-info-items px-0">
+                            <ul class="upload-info-items px-0" data-url="{{ path('api_picture_create') }}">
 {#                                <li class="upload-info-item">#}
 {#                                    <div class="icon-file">#}
 {#                                        <i class="fas fa-file-alt"></i>#}

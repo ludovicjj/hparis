@@ -23,7 +23,7 @@ class Thumbnail
         maxSize: '1024k',
         maxSizeMessage: 'Fichier trop volumineux ({{ size }} {{ suffix }}). Maximum autorisée {{ limit }} {{ suffix }}.',
         extensions: [
-//            'jpg' => 'image/jpeg',
+            'jpg' => 'image/jpeg',
             'png' => 'image/png',
             'gif' => 'image/gif'
         ],

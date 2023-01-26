@@ -4,12 +4,11 @@ namespace App\Controller\Admin;
 
 use App\Builder\ErrorsValidationBuilder;
 use App\Entity\Gallery;
-use App\Entity\Picture;
 use App\Form\Handler\CreateGalleryHandler;
 use App\Form\Type\GalleryType;
+use App\Service\PictureCleaner;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,7 +29,8 @@ class AdminGalleryController extends AbstractController
         Request $request,
         CreateGalleryHandler $galleryHandler,
         ValidatorInterface $validator,
-        EntityManagerInterface $em
+        EntityManagerInterface $entityManager,
+        PictureCleaner $pictureCleaner
     ): Response
     {
         $form = $this->createForm(GalleryType::class, new Gallery(), [
@@ -41,6 +41,11 @@ class AdminGalleryController extends AbstractController
             $gallery = $galleryHandler->handle($request);
             $constraintList = $validator->validate($gallery);
             ErrorsValidationBuilder::buildErrors($constraintList);
+
+            $entityManager->persist($gallery);
+            $entityManager->flush();
+
+            $pictureCleaner->removeOnPendingPicture();
 
             return new JsonResponse(null, Response::HTTP_NO_CONTENT);
         }
