@@ -18,7 +18,7 @@ async function onLoad(url) {
 }
 const categoryField = document.querySelector('#categories');
 categoryField.classList.remove('form-select')
-new TomSelect('#categories', {
+const control = new TomSelect('#categories', {
     hideSelected: true,
     closeAfterSelect: true,
     valueField: categoryField.dataset.value,
@@ -33,7 +33,6 @@ new TomSelect('#categories', {
         remove_button: {title: 'Supprimer cette catégorie'}
     }
 })
-
 
 class GalleryForm {
     constructor(form) {
@@ -137,6 +136,9 @@ class GalleryForm {
         // clear Uploaded files area
         const uploadPictureFiles = this.form.querySelector('.upload-info-items');
         uploadPictureFiles.replaceChildren();
+
+        // clear category
+        control.clear();
     }
 
     /**
