@@ -208,7 +208,7 @@ input[type="file"]:focus + label {
         display: flex;
         flex-direction: column;
         flex-grow: 1;
-        & .file-error > p {
+        & .file-error {
             color: var(--invalid-text-color);
         }
     }

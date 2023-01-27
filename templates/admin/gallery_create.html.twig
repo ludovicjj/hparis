@@ -67,27 +67,6 @@
                             </div>
 
                             <ul class="upload-info-items px-0" data-url="{{ path('api_picture_create') }}">
-{#                                <li class="upload-info-item">#}
-{#                                    <div class="icon-file">#}
-{#                                        <i class="fas fa-file-alt"></i>#}
-{#                                    </div>#}
-{#                                    <div class="upload-item-content">#}
-{#                                        <div class="file-name">image-1.png</div>#}
-{#                                        <div class="d-flex">#}
-{#                                            <div class="file-size form-text">70 KB</div>#}
-{#                                            <div class="file-error flex-grow-1">#}
-{#                                                <p class="form-text mb-0 text-end">Seuls les fichiers JPG, PNG et GIF sont autorisés.</p>#}
-{#                                            </div>#}
-{#                                        </div>#}
-{#                                        <div class="progress-bar">#}
-{#                                            <div class="progress"></div>#}
-{#                                        </div>#}
-{#                                    </div>#}
-{#                                    <div class="icon-state failed"></div>#}
-{#                                    <div class="icon-remove">#}
-{#                                        <i class="fa-solid fa-xmark"></i>#}
-{#                                    </div>#}
-{#                                </li>#}
                             </ul>
                         </div>
 
@@ -108,6 +87,7 @@
                 {{ form_row(form.submit) }}
                 {{ form_end(form) }}
             </section>
+            {{ include('partials/_drop_file_template.html.twig') }}
         </main>
         {{ include('partials/_footer_wave.html.twig') }}
     </div>

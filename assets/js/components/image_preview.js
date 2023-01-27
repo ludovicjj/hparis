@@ -1,4 +1,4 @@
-const imagePreview = (e, containerClassName, imageSelector) => {
+const image_preview = (e, containerClassName, imageSelector) => {
     let inputFile = e.currentTarget;
     let imageLabel = inputFile.closest(containerClassName).querySelector(imageSelector);
 
@@ -13,4 +13,4 @@ const imagePreview = (e, containerClassName, imageSelector) => {
     }
 }
 
-export { imagePreview }
+export { image_preview }
