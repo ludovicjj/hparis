@@ -1,3 +1,5 @@
+import axios from "axios";
+
 class DropFile {
     /**
      * @param {HTMLElement} container
@@ -97,7 +99,6 @@ class DropFile {
             const fileTemplate = fragment.cloneNode(true);
             const filename = this._getFileName(file, 12);
             const filesize = this._getFileSize(file)
-
             fileTemplate.querySelector(this.template.filename).innerText = filename
             fileTemplate.querySelector(this.template.filesize).innerText = filesize
             this.fileArea.append(fileTemplate)
@@ -114,49 +115,52 @@ class DropFile {
         const file = files[index];
         const url = this.fileArea.dataset.url
 
+        const controller = new AbortController();
         const formData = new FormData();
         formData.append('upload', file);
 
         const fileItems = Array.from(this.fileArea.querySelectorAll('.' + this.fileContainer));
         const position = index + count
         const currentFile = fileItems[position]
+
         const fileProgress = currentFile.querySelector(this.template.progress)
         const fileState = currentFile.querySelector(this.template.state)
+        const fileStop = currentFile.querySelector('.icon-abort');
 
-        const xhr = new XMLHttpRequest();
+        // enable pointer-event on abort btn
+        fileStop.classList.add('active');
+        fileStop.addEventListener('click', () => controller.abort(), {once: true})
+        // reset icon to abort btn
+        if (fileStop.classList.contains('abort')) {
+            fileStop.innerHTML = '<i class="fa-solid fa-xmark"></i>'
+            fileStop.classList.remove('abort');
+        }
 
-        xhr.upload.addEventListener("progress", ({loaded, total}) => {
-            fileProgress.style.width = Math.floor((loaded / total) * 100) + '%'
-        })
-
-        xhr.addEventListener("load", () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                fileState.classList.remove('loading')
-                fileState.classList.add('success')
-                let data = JSON.parse(xhr.responseText)
-                currentFile.dataset.pictureId = data.id
-                currentFile.classList.add('valid-file')
-            } else {
-                let data = JSON.parse(xhr.responseText);
-                let errors = data.errors;
-                const itemErrorContainer = currentFile.querySelector(this.template.error)
-                for (const error of errors) {
-                    itemErrorContainer.innerText = error.message;
-                }
-                fileState.classList.remove('loading');
-                fileState.classList.add('failed');
-                currentFile.classList.add('invalid-file')
+        axios({
+            url,
+            method: 'post',
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            signal: controller.signal,
+            data: formData,
+            onUploadProgress: function ({ loaded, total }) {
+                fileProgress.style.width = Math.floor((loaded / total) * 100) + '%'
             }
-
+        }).then(response => {
+            this._handleSuccess(response.data, currentFile, fileState, fileStop)
+        }).catch(error => {
+            if (axios.isCancel(error)) {
+                this._handleCancel(file, fileStop, fileState, position)
+                return;
+            }
+            if (error.response.status === 422) {
+                const data = error.response.data
+                this._handleError(data.errors, currentFile, fileState, fileStop)
+            }
+        }).finally(_ => {
             if (index < (files.length - 1)) {
                 this._uploadFile(files, index + 1, count)
             }
         })
-
-        xhr.open("POST", url, true)
-        xhr.withCredentials = true;
-        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest")
-        xhr.send(formData)
     }
 
     /**
@@ -206,6 +210,62 @@ class DropFile {
     _resetDropAreaStyle () {
         this.counter = 0;
         this.dropArea.classList.remove('active');
+    }
+
+    /**
+     * Update style when upload success
+     * @param {Object} data
+     * @param {HTMLElement} currentFile
+     * @param {HTMLElement} fileState
+     * @param {HTMLElement} fileStop
+     * @private
+     */
+    _handleSuccess (data, currentFile, fileState, fileStop) {
+        fileState.classList.remove('loading')
+        fileState.classList.remove('abort')
+        fileState.classList.add('success')
+
+        fileStop.classList.remove('active')
+
+        currentFile.classList.add('valid-file')
+        currentFile.dataset.pictureId = data.id
+    }
+
+    /**
+     * Update style when upload canceled
+     * @param {File} file
+     * @param {HTMLElement} fileStop
+     * @param {HTMLElement} fileState
+     * @param {number} position
+     * @private
+     */
+    _handleCancel (file, fileStop, fileState, position) {
+        fileStop.classList.add('abort')
+        fileStop.innerHTML = '<i class="fa-solid fa-rotate-right"></i>'
+        fileState.classList.add('abort')
+        fileStop.addEventListener('click', () => {
+            this._uploadFile([file], 0 , position)
+        }, {once: true})
+    }
+
+    /**
+     * Update style when upload failed
+     * @param {Object[]} errors
+     * @param {HTMLElement} currentFile
+     * @param {HTMLElement} fileState
+     * @param {HTMLElement} fileStop
+     * @private
+     */
+    _handleError(errors, currentFile, fileState, fileStop) {
+        const itemErrorContainer = currentFile.querySelector(this.template.error)
+
+        for (const error of errors) {
+            itemErrorContainer.innerText = error.message;
+        }
+        fileStop.classList.remove('active')
+        fileState.classList.remove('loading');
+        fileState.classList.add('failed');
+        currentFile.classList.add('invalid-file')
     }
 
 }

@@ -167,6 +167,10 @@ input[type="file"]:focus + label {
     border: solid 1px var(--main-light-color);
     border-radius: .5rem;
     padding: .5rem;
+    transition: opacity .3s ease-in-out;
+    &.removing {
+        opacity: .5;
+    }
     & .icon-file,
     & .icon-state,
     & .icon-remove {
@@ -218,7 +222,7 @@ input[type="file"]:focus + label {
             background-size: 1rem;
         }
         &.loading {
-            background: url('../../images/loader.svg') center / contain no-repeat;
+            background: #fff url('../../images/loader.svg') center / contain no-repeat;
         }
         &.failed {
             background-color: var(--invalid-color);
@@ -227,20 +231,39 @@ input[type="file"]:focus + label {
             background-repeat: no-repeat;
             background-size: 1rem;
         }
+        &.abort {
+            background: #fff url('../../images/abort.svg') center no-repeat;
+            background-size: 1.875rem;
+        }
         height: 30px;
         width: 30px;
         line-height: 30px;
         border-radius: 50%;
-        background-color: #fff;
         transition: background-color .4s ease-in-out;
     }
-    & .icon-remove {
-        height: 50px;
-        width: 50px;
-        line-height: 50px;
+    & .icon-abort {
+        height: 30px;
+        width: 30px;
+        line-height: 28px;
+        border-radius: .375rem;
+        border: 1px solid rgba(33, 37, 41, 0.5);
         color: rgba(33, 37, 41, 0.5);
-        &:hover {
+        cursor: pointer;
+        background-color: #fff;
+        pointer-events: none;
+        &:focus-visible {
+            box-shadow: 0 0 0 0.25rem var(--invalid-text-color-rgba);
+            outline: none;
+        }
+        &.active {
+            border: 1px solid var(--invalid-color);
             color: var(--invalid-color);
+            pointer-events: auto;
+            &:hover {
+                background-color: var(--invalid-color);
+                border-color: var(--invalid-color);
+                color: #fff;
+            }
         }
     }
 }
