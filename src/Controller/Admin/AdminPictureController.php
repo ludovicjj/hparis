@@ -11,8 +11,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+#[IsGranted("ROLE_ADMIN")]
 class AdminPictureController extends AbstractController
 {
     #[Route('/api/pictures', name: "api_picture_create", methods: ["POST"])]
@@ -23,7 +25,7 @@ class AdminPictureController extends AbstractController
     ): Response
     {
         if ($request->isXmlHttpRequest()) {
-            $uploadFile = $request->files->get('upload', null);
+            $uploadFile = $request->files->get('upload');
 
             if ($uploadFile instanceof UploadedFile) {
                 $picture = new Picture();

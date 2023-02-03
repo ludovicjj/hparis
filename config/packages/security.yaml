@@ -17,14 +17,10 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            entry_point: form_login
             login_throttling:
                 max_attempts: 3
-            form_login:
-                login_path: app_login
-                check_path: app_login
-                enable_csrf: true
-                # default_target_path: app_admin
+            custom_authenticator: App\Security\AppAuthenticator
+            entry_point: App\Security\AppAuthenticator
             logout:
                 path: app_logout
                 target: app_login
