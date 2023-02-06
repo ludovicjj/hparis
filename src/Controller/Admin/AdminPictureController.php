@@ -35,8 +35,8 @@ class AdminPictureController extends AbstractController
                 $constraintList = $validator->validate($picture);
                 ErrorsValidationBuilder::buildErrors($constraintList);
 
-                $entityManager->persist($picture);
-                $entityManager->flush();
+//                $entityManager->persist($picture);
+//                $entityManager->flush();
 
                 $json = ['id' => $picture->getId(), 'name' => $picture->getImageName()];
                 return new JsonResponse($json, Response::HTTP_CREATED);

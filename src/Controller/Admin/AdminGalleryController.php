@@ -6,12 +6,14 @@ use App\Builder\ErrorsValidationBuilder;
 use App\Entity\Gallery;
 use App\Form\Handler\CreateGalleryHandler;
 use App\Form\Type\GalleryType;
+use App\Repository\GalleryRepository;
 use App\Service\PictureCleaner;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -58,9 +60,19 @@ class AdminGalleryController extends AbstractController
     }
 
     #[Route('/gallery/update/{id}', name: 'gallery_update')]
-    public function update(): Response
+    public function update(
+        Request $request,
+        int $id,
+        GalleryRepository $galleryRepository
+    ): Response
     {
-        $form = $this->createForm(GalleryType::class, new Gallery(), [
+        $gallery = $galleryRepository->findGalleryUpdate($id);
+
+        if (!$gallery) {
+            throw new NotFoundHttpException('gallery not found');
+        }
+
+        $form = $this->createForm(GalleryType::class, $gallery, [
             'action' => $this->generateUrl('admin_gallery_create')
         ]);
 
