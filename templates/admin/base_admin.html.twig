@@ -4,8 +4,10 @@
 
 {% block javascripts %}
     {{ parent() }}
+    {{ encore_entry_script_tags('app_admin') }}
 {% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
+    {{ encore_entry_link_tags('app_admin') }}
 {% endblock %}

@@ -25,6 +25,12 @@ footer .social {
     align-items: center;
     font-size: 1.5rem;
 }
+footer .social > .social-link {
+    color: inherit;
+    &:hover {
+        color: var(--main-dark-color);
+    }
+}
 @media (min-width: 768px) {
     footer {
         padding: 2rem 0 3rem;
@@ -37,6 +43,6 @@ footer .social {
     }
     footer .social {
         justify-content: flex-end;
-        font-size: 1rem;
+        font-size: 1.2rem;
     }
 }

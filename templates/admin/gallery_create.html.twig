@@ -1,0 +1,94 @@
+{% extends 'admin/base_admin.html.twig' %}
+{% form_theme form _self %}
+{% use "form/vich_image_widget.html.twig" %}
+
+{% block title %}{{ parent() }}-Galerie{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('admin_gallery_create') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('admin_gallery_create') }}
+{% endblock %}
+
+{% block body %}
+    {% set breadcrumb = [{'label': 'Admin','path': '#'},{'label': 'Gallery','path': '#'},{'label': 'Ajouter','path': '#'}] %}
+
+    <div class="page-wrapper">
+        {{ include ('partials/_wave_header.html.twig', {
+            title : 'Ajouter une galerie',
+            description : "Cette page vous permet de créer votre propre galerie.
+            Veuillez noter que les champs suivis d'un astérisque (*) sont obligatoires et doivent être remplis pour que la création de la galerie soit possible.
+            Pensez à sauvegarder quand vous êtes satisfait !",
+            breadcrumbs: [{'label': 'Admin','path': '#'},{'label': 'Gallery','path': '#'},{'label': 'Ajouter','path': '#'}]
+        }) }}
+
+        <main class="container pt-4">
+            <section class="gallery-action">
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'form-gallery'}}) }}
+                <div class="gallery-form-grid mb-3">
+                    <div class="grid-item-left">
+                        <div class="mb-3 title">
+                            {{ form_label(form.title) }}
+                            {{ form_widget(form.title) }}
+                            {{ form_help(form.title) }}
+                            {{ form_errors(form.title) }}
+                        </div>
+                        <div class="mb-3 category">
+                            {{ form_label(form.categories) }}
+                            {{ form_widget(form.categories) }}
+                            {{ form_help(form.categories) }}
+                            {{ form_errors(form.categories) }}
+                        </div>
+                        <div class="mb-3 state">
+                            <div class="form-label">Visibilité</div>
+                            {{ form_label(form.state) }}
+                            {{ form_widget(form.state) }}
+                            {{ form_help(form.state) }}
+                            {{ form_errors(form.state) }}
+                        </div>
+
+                        <div class="uploads-container">
+                            <p class="mb-0">Télécharger</p>
+                            <div id="upload_help" class="form-text mb-1 help-text">Ajouter vos images à la galerie</div>
+
+                            <div class="upload-drop-area mb-4">
+                                <button type="button" class="btn upload-drop_add">
+                                    <i class="fa-solid fa-folder-open"></i>
+                                    <span class="icon-more">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </span>
+                                </button>
+                                <span class="upload-help">Glisser et déposer vos fichiers ici</span>
+                                {{ form_widget(form.uploads) }}
+                            </div>
+
+                            <ul class="upload-info-items px-0" data-url="{{ path('api_picture_create') }}">
+                            </ul>
+                        </div>
+
+
+                    </div>
+                    <div class="grid-item-right">
+                        <hr class="border border-1 opacity-50 d-block d-lg-none">
+                        <div class="thumbnail target-preview">
+                            {% for thumbnail in form.thumbnail.children %}
+                                {{ form_label(thumbnail) }}
+                                {{ form_widget(thumbnail) }}
+                                {{ form_help(thumbnail) }}
+                                {{ form_errors(thumbnail) }}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {{ form_row(form.submit) }}
+                {{ form_end(form) }}
+            </section>
+            {{ include('partials/_drop_file_template.html.twig') }}
+        </main>
+        {{ include('partials/_footer_wave.html.twig') }}
+    </div>
+{% endblock %}

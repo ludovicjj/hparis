@@ -1,0 +1,70 @@
+.wave-header {
+    & .wave-header_background {
+        background-color: var(--main-color);
+    }
+    & .container {
+        display: flex;
+    }
+    color: #fff;
+}
+
+// Breadcrumb
+.wave-header .breadcrumb {
+    display: flex;
+    height: 48px;
+    color: var(--breadcrumb-color);
+    align-items: center;
+    gap: .5rem;
+    font-size: .8rem;
+    opacity: .8;
+    & .breadcrumb-link {
+        text-decoration: none;
+        color: inherit;
+        &:hover {
+            text-decoration: var(--breadcrumb-color) underline;
+        }
+    }
+}
+
+// Title and info
+.wave-header_body .wave-header_title {
+    font-size: 42px;
+    font-weight: 700;
+    font-style: normal;
+}
+.wave-header_body > p {
+    font-size: 1rem;
+}
+
+// Svg
+.wave-header .wave {
+    height: 70px;
+    position: relative;
+    top: -1px;
+    pointer-events: none;
+}
+.wave-header .wave .wave-header-svg {
+    max-height: 200px;
+    width: 100%;
+    margin: auto;
+    display: block;
+    fill: var(--main-color);
+}
+@media (min-width: 576px) {
+    .wave-header .wave {
+        height: 85px;
+    }
+}
+@media (min-width: 768px) {
+    .wave-header .wave {
+        height: 100px;
+    }
+}
+@media (min-width: 992px) {
+    .wave-header .wave {
+        height: 140px;
+    }
+    .wave-header_body > p {
+        font-size: 1.2rem;
+    }
+}

@@ -1,7 +1,7 @@
 // Navbar
 .header {
     background-color: #FFFFFF;
-    box-shadow: 0 0 25px $box-shadow-color;
+    box-shadow: 0 0 25px var(--box-shadow-rgba);
     position: relative;
     width: 100%;
 }
@@ -34,7 +34,7 @@
     }
 }
 .header .hamburger {
-    fill: $hamburger-color;
+    fill: var(--hamburger-color);
 }
 .navbar-toggler[aria-expanded="true"] {
     & .top, & .bottom {
