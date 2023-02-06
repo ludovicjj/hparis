@@ -56,4 +56,16 @@ class AdminGalleryController extends AbstractController
             'form' => $form
         ]);
     }
+
+    #[Route('/gallery/update/{id}', name: 'gallery_update')]
+    public function update(): Response
+    {
+        $form = $this->createForm(GalleryType::class, new Gallery(), [
+            'action' => $this->generateUrl('admin_gallery_create')
+        ]);
+
+        return $this->render('/admin/gallery_update.html.twig', [
+            'form' => $form
+        ]);
+    }
 }
