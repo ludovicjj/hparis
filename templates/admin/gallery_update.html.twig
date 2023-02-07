@@ -67,6 +67,17 @@
                             <ul class="upload-info-items px-0" data-url="{{ path('api_picture_create') }}">
                             </ul>
                         </div>
+                        <div class="picture" data-total="{{ totalPictures }}" data-limit="{{ limit }}" data-current="1" data-gallery="{{ galleryId }}">
+                            {% for picture in pictures %}
+                                <div class="picture-item">
+                                    <img src="{{ asset('uploads/pictures/' ~ picture.imageName) }}" alt="">
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center">
+                            </ul>
+                        </nav>
                     </div>
 
                     <div class="grid-item-right">

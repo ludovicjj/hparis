@@ -36,7 +36,7 @@ class Gallery
     #[ORM\Column]
     private ?bool $state = null;
 
-    #[ORM\ManyToMany(targetEntity: Picture::class)]
+    #[ORM\ManyToMany(targetEntity: Picture::class, inversedBy: 'galleries')]
     #[Assert\Valid]
     private Collection $pictures;
 

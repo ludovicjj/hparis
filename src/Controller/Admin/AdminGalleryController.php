@@ -7,6 +7,7 @@ use App\Entity\Gallery;
 use App\Form\Handler\CreateGalleryHandler;
 use App\Form\Type\GalleryType;
 use App\Repository\GalleryRepository;
+use App\Repository\PictureRepository;
 use App\Service\PictureCleaner;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -63,7 +64,8 @@ class AdminGalleryController extends AbstractController
     public function update(
         Request $request,
         int $id,
-        GalleryRepository $galleryRepository
+        GalleryRepository $galleryRepository,
+        PictureRepository $pictureRepository
     ): Response
     {
         $gallery = $galleryRepository->findGalleryUpdate($id);
@@ -72,12 +74,21 @@ class AdminGalleryController extends AbstractController
             throw new NotFoundHttpException('gallery not found');
         }
 
+        $limit = 8;
+        $paginatedPicture = $pictureRepository->paginatedPictureByGallery($gallery->getId(), $limit, 1);
+        $pictures = iterator_to_array($paginatedPicture);
+
+
         $form = $this->createForm(GalleryType::class, $gallery, [
             'action' => $this->generateUrl('admin_gallery_create')
         ]);
 
         return $this->render('/admin/gallery_update.html.twig', [
-            'form' => $form
+            'form' => $form,
+            'pictures' => $pictures,
+            'totalPictures' => $paginatedPicture->count(),
+            'limit' => $limit,
+            'galleryId' => $gallery->getId()
         ]);
     }
 }
