@@ -75,6 +75,18 @@ class PictureRepository extends ServiceEntityRepository
             ->getQuery();
     }
 
+    public function findLastImageByPage(int $galleryId)
+    {
+        return $this->createQueryBuilder('p')
+            ->innerJoin('p.galleries', 'g')
+            ->andWhere('g.id = :id')
+            ->setParameter('id', $galleryId)
+            ->setFirstResult(8)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Picture[] Returns an array of Picture objects
 //     */

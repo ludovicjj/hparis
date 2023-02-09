@@ -76,4 +76,25 @@ class AdminPictureController extends AbstractController
         }
         return new JsonResponse("Bad request", Response::HTTP_BAD_REQUEST);
     }
+
+    #[Route('/api/pictures/test', name: "api_picture_delete", methods: ["GET"])]
+    public function delete(PictureRepository $pictureRepository)
+    {
+        // Var needed : Page, Gallery Id, image count for the current page
+        // Si le nombre d'image sur cette page est = 8
+        // Alors je recupere la 1ere image de la page suivante(ici 2) (LIMIT 1, page * 8)
+        // Ensuite je supprime l'image de la page 1.
+        // Je retourne l'image recuperée de la page 2
+        // Je greffe cette image sur la page 1
+        // Je reconstruit la pagination
+
+        // si le nombre d'image sur cette page est < 8
+        // Je suis sur le derniere page
+        // PAS besoin de chercher une image pour completer la page.
+        //
+        //
+        $result = $pictureRepository->findLastImageByPage(8);
+        dd($result);
+        return new JsonResponse('hello');
+    }
 }

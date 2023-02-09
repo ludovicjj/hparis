@@ -105,6 +105,8 @@ function buildPagination () {
 
     let paginationLinks = getPaginationLinks(parseInt(currentPage), totalPage);
 
+    paginationContainer.replaceChildren()
+
     paginationLinks.forEach(link => {
         const linkHTML = getPaginationHTML(link, currentPage)
         paginationContainer.appendChild(linkHTML)
@@ -112,42 +114,51 @@ function buildPagination () {
 }
 const handlePageClick = (e) => {
     e.preventDefault();
-    pictureContainer.dataset.current = e.currentTarget.dataset.page;
-    paginationContainer.replaceChildren();
+    const page = e.currentTarget.dataset.page
+    pictureContainer.dataset.current = page
+    pictureContainer.classList.add('loading')
 
     buildPagination()
+
+    loadPicture(page).then(pictures => {
+        pictureContainer.replaceChildren();
+        pictures.forEach(({id, imageName}) => {
+            const img = document.createElement('img')
+            img.setAttribute('src', `/uploads/pictures/${imageName}`)
+
+            const div = document.createElement('div');
+            div.classList.add('picture-item')
+
+            const btn = document.createElement('button');
+            btn.classList.add('picture-delete');
+            btn.setAttribute('type', 'button')
+            btn.innerHTML = '<i class="fa-solid fa-xmark"></i>'
+            btn.dataset.pictureId = id
+
+            div.appendChild(img)
+            div.appendChild(btn)
+            pictureContainer.appendChild(div)
+        })
+    }).catch(err => {
+        console.log(err)
+    }).finally(_ => {
+        pictureContainer.classList.remove('loading')
+    })
 }
-const handlePage = async (e) => {
-    e.preventDefault();
-
-    const page = e.currentTarget.dataset.page;
-    targetPagination.querySelectorAll('li').forEach(item => {
-        item.classList.remove('active');
-    });
-    e.currentTarget.classList.add('active');
-
-
-    ///api/pictures?page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}&gallery=${encodeURIComponent(galleryId)}
-    const response = await fetch(`/api/pictures?page=${page}&id=${galleryId}&limit=${limit}`, {
+const loadPicture = async (page) => {
+    const response = await fetch(`/api/pictures?page=${page}&id=${galleryId}&limit=${itemPerPage}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
         },
     })
-    if (response.ok) {
-        const pictures = await response.json()
-        pictureContainer.replaceChildren();
-        pictures.forEach(picture => {
-            const img = document.createElement('img')
-            img.setAttribute('src', `/uploads/pictures/${picture.imageName}`)
-            const div = document.createElement('div');
-            div.classList.add('picture-item')
+    const data = await response.json()
 
-            div.appendChild(img)
-            pictureContainer.appendChild(div)
-        })
-
+    if (!response.ok) {
+        return Promise.reject(data)
     }
+
+    return Promise.resolve(data)
 }
 buildPagination(totalPage);
