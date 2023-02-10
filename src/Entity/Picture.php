@@ -47,13 +47,9 @@ class Picture
     #[ORM\Column(type: 'boolean', nullable: true)]
     private ?bool $isPending = null;
 
-    #[ORM\ManyToMany(targetEntity: Gallery::class, mappedBy: 'pictures')]
-    private Collection $galleries;
+    #[ORM\ManyToOne(inversedBy: 'pictures')]
+    private ?Gallery $gallery = null;
 
-    public function __construct()
-    {
-        $this->galleries = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -126,29 +122,14 @@ class Picture
         return $this->isPending;
     }
 
-    /**
-     * @return Collection<int, Gallery>
-     */
-    public function getGalleries(): Collection
+    public function getGallery(): ?Gallery
     {
-        return $this->galleries;
+        return $this->gallery;
     }
 
-    public function addGallery(Gallery $gallery): self
+    public function setGallery(?Gallery $gallery): self
     {
-        if (!$this->galleries->contains($gallery)) {
-            $this->galleries->add($gallery);
-            $gallery->addPicture($this);
-        }
-
-        return $this;
-    }
-
-    public function removeGallery(Gallery $gallery): self
-    {
-        if ($this->galleries->removeElement($gallery)) {
-            $gallery->removePicture($this);
-        }
+        $this->gallery = $gallery;
 
         return $this;
     }
