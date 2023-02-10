@@ -4,13 +4,16 @@ namespace App\Controller\Admin;
 
 use App\Builder\ErrorsValidationBuilder;
 use App\Entity\Picture;
+use App\Repository\GalleryRepository;
 use App\Repository\PictureRepository;
+use App\Security\Voter\PictureVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -45,7 +48,9 @@ class AdminPictureController extends AbstractController
                 return new JsonResponse($json, Response::HTTP_CREATED);
             }
         }
-        return new JsonResponse("Bad request", Response::HTTP_BAD_REQUEST);
+
+        $data = ['message' => "Bad request", 'code' => Response::HTTP_BAD_REQUEST];
+        return new JsonResponse($data, Response::HTTP_BAD_REQUEST);
     }
 
     #[Route('/api/pictures', name: "api_picture_search", methods: ["GET"])]
@@ -57,44 +62,70 @@ class AdminPictureController extends AbstractController
     {
         if ($request->isXmlHttpRequest()) {
             $page = $request->query->get('page', 1);
-            $limit = $request->query->get('limit', 8);
-            $galleryId = $request->query->get('id', null);
+            $galleryId = $request->query->get('id');
 
             if ($page < 1) {
                 return new JsonResponse("Page Not Found", Response::HTTP_NOT_FOUND);
             }
 
-            $pictures = $pictureRepository->searchPictureByPageAndGallery($galleryId, $limit, $page);
+            $pictures = $pictureRepository->searchPictureByPageAndGallery($galleryId, $page);
 
             $data = $serializer->serialize(
                 $pictures,
                 'json',
-                [AbstractNormalizer::IGNORED_ATTRIBUTES => ['galleries']]
+                [AbstractNormalizer::IGNORED_ATTRIBUTES => ['gallery']]
             );
 
             return new JsonResponse($data, 200, [], true);
         }
-        return new JsonResponse("Bad request", Response::HTTP_BAD_REQUEST);
+
+        $data = ['message' => "Bad request", 'code' => Response::HTTP_BAD_REQUEST];
+        return new JsonResponse($data, Response::HTTP_BAD_REQUEST);
     }
 
-    #[Route('/api/pictures/test', name: "api_picture_delete", methods: ["GET"])]
-    public function delete(PictureRepository $pictureRepository)
+    #[Route('/api/pictures/{id}', name: "api_picture_delete", methods: ["DELETE"])]
+    public function delete(
+        Request $request,
+        PictureRepository $pictureRepository,
+        SerializerInterface $serializer,
+        int $id,
+    ): Response
     {
-        // Var needed : Page, Gallery Id, image count for the current page
-        // Si le nombre d'image sur cette page est = 8
-        // Alors je recupere la 1ere image de la page suivante(ici 2) (LIMIT 1, page * 8)
-        // Ensuite je supprime l'image de la page 1.
-        // Je retourne l'image recuperée de la page 2
-        // Je greffe cette image sur la page 1
-        // Je reconstruit la pagination
+        if ($request->isXmlHttpRequest()) {
+            $page = $request->request->getInt('page', 1);
+            $count = $request->request->getInt('count');
+            $galleryId = $request->request->getInt('galleryId');
 
-        // si le nombre d'image sur cette page est < 8
-        // Je suis sur le derniere page
-        // PAS besoin de chercher une image pour completer la page.
-        //
-        //
-        $result = $pictureRepository->findLastImageByPage(8);
-        dd($result);
-        return new JsonResponse('hello');
+            $pictureToDelete = $pictureRepository->find($id);
+
+            if (!$pictureToDelete) {
+                throw new NotFoundHttpException('Picture Not Found');
+            }
+
+            $this->denyAccessUnlessGranted(PictureVoter::DELETE, $pictureToDelete);
+            $nextPicture = $pictureRepository->findFistImageOnNextPage($galleryId, $page);
+            $pictureRepository->remove($pictureToDelete, true);
+
+            if ($count !== PictureRepository::ITEMS_PER_PAGE) {
+                return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+            }
+
+            if ($nextPicture) {
+                $json = $serializer->serialize(
+                    $nextPicture,
+                    'json',
+                    [AbstractNormalizer::IGNORED_ATTRIBUTES => ['gallery']]
+                );
+                return new JsonResponse($json, Response::HTTP_OK, [], true);
+            } else {
+                return new JsonResponse(
+                    ['message' => 'Not Found', 'code' => Response::HTTP_NOT_FOUND],
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+        }
+
+        $data = ['message' => "Bad request", 'code' => Response::HTTP_BAD_REQUEST];
+        return new JsonResponse($data, Response::HTTP_BAD_REQUEST);
     }
 }

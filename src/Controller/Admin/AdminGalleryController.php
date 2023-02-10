@@ -74,21 +74,20 @@ class AdminGalleryController extends AbstractController
             throw new NotFoundHttpException('gallery not found');
         }
 
-        $limit = 8;
-        $paginatedPicture = $pictureRepository->paginatedPictureByGallery($gallery->getId(), $limit, 1);
+        $paginatedPicture = $pictureRepository->paginatedPictureByGallery($id, 1);
         $pictures = iterator_to_array($paginatedPicture);
 
 
         $form = $this->createForm(GalleryType::class, $gallery, [
-            'action' => $this->generateUrl('admin_gallery_create')
+            'action' => $this->generateUrl('admin_gallery_update', ['id' => $id])
         ]);
 
         return $this->render('/admin/gallery_update.html.twig', [
             'form' => $form,
             'pictures' => $pictures,
             'totalPictures' => $paginatedPicture->count(),
-            'limit' => $limit,
-            'galleryId' => $gallery->getId()
+            'per_page' => PictureRepository::ITEMS_PER_PAGE,
+            'galleryId' => $id
         ]);
     }
 }

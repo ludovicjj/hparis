@@ -26,11 +26,9 @@ new DropFile(
 const pictureContainer = document.querySelector('.picture');
 const paginationContainer = document.querySelector('.pagination');
 
-const totalItems = parseInt(pictureContainer.dataset.total)
-const itemPerPage = parseInt(pictureContainer.dataset.limit)
+const itemPerPage = parseInt(pictureContainer.dataset.perPage)
 const galleryId = pictureContainer.dataset.gallery;
 
-const totalPage = Math.ceil(totalItems / itemPerPage);
 
 /**
  *
@@ -69,6 +67,51 @@ const getPaginationLinks = (currentPage, totalPage) => {
     return links;
 }
 
+const deletePicture = (e) => {
+    e.preventDefault();
+
+    const pictureId = e.currentTarget.dataset.pictureId
+    const count = pictureContainer.childElementCount;
+    const page = paginationContainer.querySelector('.active').dataset.page
+    e.currentTarget.closest('.picture-item').remove()
+    const body = JSON.stringify({page, count, galleryId});
+
+    handleDelete(pictureId, body).then(pictures => {
+        pictureContainer.dataset.total = (pictureContainer.dataset.total - 1).toString()
+        pictures.forEach(({id, imageName}) => {
+            createPicture(id, imageName)
+        })
+
+    }).catch(err => {
+        console.log(err)
+    }).finally(_ => {
+        buildPagination()
+    })
+
+}
+
+const handleDelete = async (pictureId, body) => {
+    const response = await fetch(`/api/pictures/${pictureId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/json',
+        },
+        body
+    })
+
+    let data = [];
+    if (response.headers.get('content-type') === 'application/json') {
+        data = await response.json();
+    }
+
+    if (response.ok) {
+        return Promise.resolve(data)
+    } else {
+        return Promise.reject(data)
+    }
+}
+
 /**
  * Build Bootstrap-style pagination links
  * @param page
@@ -100,7 +143,8 @@ function getPaginationHTML(page, currentPage) {
     return li;
 }
 function buildPagination () {
-    const currentPage = pictureContainer.dataset.current;
+    const currentPage = pictureContainer.dataset.page;
+    const totalItems = parseInt(pictureContainer.dataset.total)
     const totalPage = Math.ceil(totalItems / itemPerPage);
 
     let paginationLinks = getPaginationLinks(parseInt(currentPage), totalPage);
@@ -115,7 +159,7 @@ function buildPagination () {
 const handlePageClick = (e) => {
     e.preventDefault();
     const page = e.currentTarget.dataset.page
-    pictureContainer.dataset.current = page
+    pictureContainer.dataset.page = page
     pictureContainer.classList.add('loading')
 
     buildPagination()
@@ -123,21 +167,7 @@ const handlePageClick = (e) => {
     loadPicture(page).then(pictures => {
         pictureContainer.replaceChildren();
         pictures.forEach(({id, imageName}) => {
-            const img = document.createElement('img')
-            img.setAttribute('src', `/uploads/pictures/${imageName}`)
-
-            const div = document.createElement('div');
-            div.classList.add('picture-item')
-
-            const btn = document.createElement('button');
-            btn.classList.add('picture-delete');
-            btn.setAttribute('type', 'button')
-            btn.innerHTML = '<i class="fa-solid fa-xmark"></i>'
-            btn.dataset.pictureId = id
-
-            div.appendChild(img)
-            div.appendChild(btn)
-            pictureContainer.appendChild(div)
+            createPicture(id, imageName)
         })
     }).catch(err => {
         console.log(err)
@@ -145,8 +175,28 @@ const handlePageClick = (e) => {
         pictureContainer.classList.remove('loading')
     })
 }
+
+const createPicture = (id, imageName) => {
+    const img = document.createElement('img')
+    img.setAttribute('src', `/uploads/pictures/${imageName}`)
+
+    const div = document.createElement('div');
+    div.classList.add('picture-item')
+
+    const btn = document.createElement('button');
+    btn.classList.add('picture-delete');
+    btn.setAttribute('type', 'button')
+    btn.innerHTML = '<i class="fa-solid fa-xmark"></i>'
+    btn.dataset.pictureId = id
+
+    btn.addEventListener('click', deletePicture)
+
+    div.appendChild(img)
+    div.appendChild(btn)
+    pictureContainer.appendChild(div)
+}
 const loadPicture = async (page) => {
-    const response = await fetch(`/api/pictures?page=${page}&id=${galleryId}&limit=${itemPerPage}`, {
+    const response = await fetch(`/api/pictures?page=${page}&id=${galleryId}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -161,4 +211,8 @@ const loadPicture = async (page) => {
 
     return Promise.resolve(data)
 }
-buildPagination(totalPage);
+
+buildPagination();
+document.querySelectorAll('.picture-delete').forEach(btn => {
+    btn.addEventListener('click', deletePicture)
+})
