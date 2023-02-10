@@ -18,6 +18,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PictureRepository extends ServiceEntityRepository
 {
+    const ITEMS_PER_PAGE = 8;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Picture::class);
@@ -50,40 +52,38 @@ class PictureRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function paginatedPictureByGallery(int $galleryId, int $limit, int $page): Paginator
+    public function paginatedPictureByGallery(int $galleryId, int $page): Paginator
     {
-        $query = $this->searchPicturesByGalleryAndLimit($galleryId, $limit, $page);
+        $query = $this->searchPicturesByGalleryAndLimit($galleryId, $page);
+
         return new Paginator($query);
     }
 
-    public function searchPictureByPageAndGallery(int $galleryId, int $limit, int $page)
+    public function searchPictureByPageAndGallery(int $galleryId, int $page)
     {
-        $query = $this->searchPicturesByGalleryAndLimit($galleryId, $limit, $page);
+        $query = $this->searchPicturesByGalleryAndLimit($galleryId, $page);
         return $query->getResult();
     }
 
-    private function searchPicturesByGalleryAndLimit(int $galleryId, int $limit, int $page): Query
+    private function searchPicturesByGalleryAndLimit(int $galleryId, int $page): Query
     {
-        $offset = ($page - 1 ) * $limit;
+        $offset = ($page - 1 ) * self::ITEMS_PER_PAGE;
 
         return $this->createQueryBuilder('p')
-            ->innerJoin('p.galleries', 'g')
-            ->andWhere('g.id = :id')
+            ->andWhere('p.gallery = :id')
             ->setParameter('id', $galleryId)
             ->setFirstResult($offset)
-            ->setMaxResults($limit)
+            ->setMaxResults(self::ITEMS_PER_PAGE)
             ->getQuery();
     }
 
-    public function findLastImageByPage(int $galleryId)
+    public function findFistImageOnNextPage(int $galleryId, int $page)
     {
-        return $this->createQueryBuilder('p')
-            ->innerJoin('p.galleries', 'g')
-            ->andWhere('g.id = :id')
-            ->setParameter('id', $galleryId)
-            ->setFirstResult(8)
+        $query = $this->searchPicturesByGalleryAndLimit($galleryId, $page);
+        $offset = $page * self::ITEMS_PER_PAGE;
+        return $query
+            ->setFirstResult($offset)
             ->setMaxResults(1)
-            ->getQuery()
             ->getResult();
     }
 
