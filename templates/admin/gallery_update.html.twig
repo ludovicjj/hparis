@@ -69,7 +69,12 @@
                         </div>
                         <p class="mb-0">Images</p>
                         <div id="upload_help" class="form-text mb-1 help-text">L'ensemble des images de la galerie</div>
-                        <div class="picture" data-total="{{ totalPictures }}" data-per-page="{{ per_page }}" data-page="1" data-gallery="{{ galleryId }}">
+                        <div class="picture"
+                             data-total="{{ totalPictures }}"
+                             data-per-page="{{ per_page }}"
+                             data-page="1"
+                             data-gallery="{{ galleryId }}"
+                             data-url="{{ path('api_picture_search') }}">
                             {% if pictures is empty %}
                                 <div class="alert alert-primary text-center" role="alert">
                                     Il n'y a actuellement aucune image dans la galerie.

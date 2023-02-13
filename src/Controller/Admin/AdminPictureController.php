@@ -63,7 +63,10 @@ class AdminPictureController extends AbstractController
             $galleryId = $request->query->get('id');
 
             if ($page < 1) {
-                return new JsonResponse("Page Not Found", Response::HTTP_NOT_FOUND);
+                return new JsonResponse([
+                    "message" => "Page Not Found",
+                    "code" => Response::HTTP_NOT_FOUND
+                ], Response::HTTP_NOT_FOUND);
             }
 
             $pictures = $pictureRepository->searchPictureByPageAndGallery($galleryId, $page);
