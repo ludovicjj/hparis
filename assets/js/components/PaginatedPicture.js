@@ -170,7 +170,6 @@ class PaginatedPicture {
         let refresh = false
 
         if (count === 1 && this.totalPage > 1) {
-            console.log('init refresh')
             refresh = true
             this.pictureContainer.dataset.page = (page - 1).toString()
             this.pictureContainer.style.height = `${this.pictureContainer.offsetHeight}px`
@@ -195,7 +194,6 @@ class PaginatedPicture {
             console.error(err)
         }).finally(_ => {
             if (refresh) {
-                console.log('load image on prev page')
                 setTimeout(() => {
                     this.loadPictures((page - 1).toString())
                 },200)
