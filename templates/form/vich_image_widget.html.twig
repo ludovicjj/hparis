@@ -9,7 +9,7 @@
 
     {%- if image_uri -%}
         <label for="{{ form.vars.id }}" class="image_label">
-            <img src="{{ asset_helper is same as(true) ? asset(image_uri) : image_uri }}" alt="" />
+            <img src="{{ asset_helper is same as(true) ? asset(image_uri) : image_uri }}" alt="" data-origin="{{ image_uri }}"/>
         </label>
     {% else %}
         <label for="{{ form.vars.id }}" class="image_label">
