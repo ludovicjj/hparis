@@ -9,7 +9,7 @@ use App\Repository\PictureRepository;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class CreateGalleryHandler
+class GalleryHandler
 {
     public function __construct(
         private CategoryRepository $categoryRepository,
