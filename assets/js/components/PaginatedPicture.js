@@ -190,15 +190,15 @@ class PaginatedPicture {
                 nextPictures.forEach(({id, imageName}) => {
                     this.createPicture(id, imageName)
                 })
+
+                if (refresh) {
+                    setTimeout(() => {
+                        this.loadPictures((page - 1).toString())
+                    },200)
+                }
             }).catch(err => {
             console.error(err)
         }).finally(_ => {
-            if (refresh) {
-                setTimeout(() => {
-                    this.loadPictures((page - 1).toString())
-                },200)
-            }
-
             if (!this.totalItems) {
                 const alert = this.createAlert("Il n'y a actuellement aucune image dans la galerie.")
                 this.pictureContainer.appendChild(alert)
