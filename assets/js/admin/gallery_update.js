@@ -5,7 +5,7 @@ import PaginatedPicture from "../components/PaginatedPicture";
 
 
 const form = document.querySelector('#form-gallery');
-new GalleryForm(form);
+new GalleryForm(form, true);
 
 new DropFile(
     form,
