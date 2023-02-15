@@ -1,43 +1,6 @@
-#add-item {
-    position: fixed;
-    top: 230px;
-    left: 20px;
-}
+@import '../components/header_wave';
+@import "../components/footer_wave";
 
-.grid {
-    //background: #DDD;
-}
-
-/* clear fix */
-.grid:after {
-    content: '';
-    display: block;
-    clear: both;
-}
-//.small {
-//    height: 300px
-//}
-//.medium {
-//    height: 400px
-//}
-
-/* ---- .grid-item ---- */
-.grid-item {
-    float: left;
-}
-.grid-item.hidden {
-    opacity: 0;
-    transform: scale(.5);
-    transition: left .5s, top .5s, opacity .8s, transform .8s;
-}
-.grid-item.in {
-    opacity: 1;
-    transform: scale(1);
-}
-
-.grid-item img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+main.container {
+    flex-grow: 1;
 }
