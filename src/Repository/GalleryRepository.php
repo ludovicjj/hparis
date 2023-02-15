@@ -52,6 +52,15 @@ class GalleryRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    public function findGalleryList(): array
+    {
+        return $this->createQueryBuilder('g')
+            ->innerJoin('g.thumbnail', 't')
+            ->addSelect('t')
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Gallery[] Returns an array of Gallery objects
 //     */

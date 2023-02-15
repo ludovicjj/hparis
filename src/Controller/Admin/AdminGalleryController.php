@@ -25,9 +25,15 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class AdminGalleryController extends AbstractController
 {
     #[Route('/gallery', name: 'gallery')]
-    public function index(): Response
+    public function index(
+        GalleryRepository $galleryRepository
+    ): Response
     {
-        return $this->render('admin/gallery_index.html.twig');
+        $galleries = $galleryRepository->findGalleryList();
+
+        return $this->render('admin/gallery_index.html.twig', [
+            'galleries' => $galleries
+        ]);
     }
 
     #[Route('/gallery/create', name: 'gallery_create')]
