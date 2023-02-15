@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\Picture;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -16,6 +18,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PictureRepository extends ServiceEntityRepository
 {
+    const ITEMS_PER_PAGE = 8;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Picture::class);
@@ -45,6 +49,41 @@ class PictureRepository extends ServiceEntityRepository
             ->andWhere('p.isPending = :pending')
             ->setParameter('pending', true)
             ->getQuery()
+            ->getResult();
+    }
+
+    public function paginatedPictureByGallery(int $galleryId, int $page): Paginator
+    {
+        $query = $this->searchPicturesByGalleryAndLimit($galleryId, $page);
+
+        return new Paginator($query);
+    }
+
+    public function searchPictureByPageAndGallery(int $galleryId, int $page)
+    {
+        $query = $this->searchPicturesByGalleryAndLimit($galleryId, $page);
+        return $query->getResult();
+    }
+
+    private function searchPicturesByGalleryAndLimit(int $galleryId, int $page): Query
+    {
+        $offset = ($page - 1 ) * self::ITEMS_PER_PAGE;
+
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.gallery = :id')
+            ->setParameter('id', $galleryId)
+            ->setFirstResult($offset)
+            ->setMaxResults(self::ITEMS_PER_PAGE)
+            ->getQuery();
+    }
+
+    public function findFistImageOnNextPage(int $galleryId, int $page)
+    {
+        $query = $this->searchPicturesByGalleryAndLimit($galleryId, $page);
+        $offset = $page * self::ITEMS_PER_PAGE;
+        return $query
+            ->setFirstResult($offset)
+            ->setMaxResults(1)
             ->getResult();
     }
 

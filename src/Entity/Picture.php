@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PictureRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
@@ -44,6 +46,10 @@ class Picture
 
     #[ORM\Column(type: 'boolean', nullable: true)]
     private ?bool $isPending = null;
+
+    #[ORM\ManyToOne(inversedBy: 'pictures')]
+    private ?Gallery $gallery = null;
+
 
     public function getId(): ?int
     {
@@ -114,5 +120,17 @@ class Picture
     public function getIsPending(): ?bool
     {
         return $this->isPending;
+    }
+
+    public function getGallery(): ?Gallery
+    {
+        return $this->gallery;
+    }
+
+    public function setGallery(?Gallery $gallery): self
+    {
+        $this->gallery = $gallery;
+
+        return $this;
     }
 }

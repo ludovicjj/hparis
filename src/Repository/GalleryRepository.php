@@ -39,6 +39,19 @@ class GalleryRepository extends ServiceEntityRepository
         }
     }
 
+    public function findGalleryUpdate(int $id): ?Gallery
+    {
+        return $this->createQueryBuilder('g')
+            ->andWhere('g.id = :id')
+            ->setParameter('id', $id)
+            ->innerJoin('g.thumbnail', 't')
+            ->addSelect('t')
+            ->leftJoin('g.categories', 'c')
+            ->addSelect('c')
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
 //    /**
 //     * @return Gallery[] Returns an array of Gallery objects
 //     */

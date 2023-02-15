@@ -36,19 +36,19 @@ class Gallery
     #[ORM\Column]
     private ?bool $state = null;
 
-    #[ORM\ManyToMany(targetEntity: Picture::class)]
-    #[Assert\Valid]
-    private Collection $pictures;
-
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'galleries')]
     private Collection $categories;
+
+    #[ORM\OneToMany(mappedBy: 'gallery', targetEntity: Picture::class, orphanRemoval: true)]
+    #[Assert\Valid]
+    private Collection $pictures;
 
 
     public function __construct()
     {
         $this->state = false;
-        $this->pictures = new ArrayCollection();
         $this->categories = new ArrayCollection();
+        $this->pictures = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -105,30 +105,6 @@ class Gallery
     }
 
     /**
-     * @return Collection<int, Picture>
-     */
-    public function getPictures(): Collection
-    {
-        return $this->pictures;
-    }
-
-    public function addPicture(Picture $picture): self
-    {
-        if (!$this->pictures->contains($picture)) {
-            $this->pictures->add($picture);
-        }
-
-        return $this;
-    }
-
-    public function removePicture(Picture $picture): self
-    {
-        $this->pictures->removeElement($picture);
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, Category>
      */
     public function getCategories(): Collection
@@ -148,6 +124,36 @@ class Gallery
     public function removeCategory(Category $category): self
     {
         $this->categories->removeElement($category);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Picture>
+     */
+    public function getPictures(): Collection
+    {
+        return $this->pictures;
+    }
+
+    public function addPicture(Picture $picture): self
+    {
+        if (!$this->pictures->contains($picture)) {
+            $this->pictures->add($picture);
+            $picture->setGallery($this);
+        }
+
+        return $this;
+    }
+
+    public function removePicture(Picture $picture): self
+    {
+        if ($this->pictures->removeElement($picture)) {
+            // set the owning side to null (unless already changed)
+            if ($picture->getGallery() === $this) {
+                $picture->setGallery(null);
+            }
+        }
 
         return $this;
     }

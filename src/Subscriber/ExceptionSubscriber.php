@@ -24,21 +24,26 @@ class ExceptionSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($event->getThrowable() instanceof ValidatorException) {
+        if (
+            $event->getThrowable() instanceof ValidatorException ||
+            str_starts_with($event->getRequest()->getRequestUri(), "/api/")
+        ) {
             $this->sendJsonResponseException($event);
         }
     }
 
     private function sendJsonResponseException(ExceptionEvent $event): void
     {
-        /** @var ValidatorException $exception */
         $exception = $event->getThrowable();
         $statusCode = $exception->getCode() ?: 400;
         $data = [
             'message'   => $exception->getMessage(),
-            'code'      => $statusCode,
-            'errors'    => $exception->getErrors()
+            'code'      => $statusCode
         ];
+
+        if ($exception instanceof ValidatorException) {
+            $data['errors'] = $exception->getErrors();
+        }
 
         $event->setResponse(new JsonResponse($data, $statusCode));
     }

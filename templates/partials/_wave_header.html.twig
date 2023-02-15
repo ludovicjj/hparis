@@ -3,7 +3,7 @@
         <div class="container">
             <div>
                 <div class="breadcrumb">
-                    {% for breadcrumb in breadcrumb %}
+                    {% for breadcrumb in breadcrumbs %}
                         <a href="{{ breadcrumb.path }}" class="breadcrumb-link">{{ breadcrumb.label }}</a>
                         {{ loop.last ? '' : '<i class="fa-solid fa-chevron-right"></i>'}}
                     {% endfor %}

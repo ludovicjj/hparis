@@ -5,9 +5,11 @@ import Swal from "sweetalert2";
 class GalleryForm {
     /**
      * @param {HTMLFormElement} form
+     * @param {boolean} isUpdate
      */
-    constructor(form) {
+    constructor(form, isUpdate= false) {
         this.form = form
+        this.isUpdate = isUpdate
 
         this.form.querySelector('#thumbnail_imageFile').addEventListener('change', (e) => {
             image_preview(e, '.target-preview', '.image_label img')
@@ -42,14 +44,24 @@ class GalleryForm {
             const transformedErrors = this.transformPropertyErrors(errors.errors)
             this.displayErrors(transformedErrors)
         } else {
-            this.form.reset();
-            await Swal.fire({
+            const options = {
                 icon: 'success',
                 title: 'Bravo',
                 text: 'Votre galerie a été créée avec success !',
                 confirmButtonColor: '#4869ee',
                 confirmButtonText: 'Cool'
-            })
+            }
+
+            if (!this.isUpdate) {
+                Swal.fire(options).then(_ => {
+                    this.form.reset();
+                })
+            } else {
+                options.text = 'Votre galerie a été modifiée avec success !'
+                Swal.fire(options).then(_ => {
+                    location.assign(this.form.dataset.redirect)
+                })
+            }
         }
     }
 

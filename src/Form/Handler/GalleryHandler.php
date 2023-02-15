@@ -6,9 +6,10 @@ use App\Entity\Gallery;
 use App\Entity\Thumbnail;
 use App\Repository\CategoryRepository;
 use App\Repository\PictureRepository;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class CreateGalleryHandler
+class GalleryHandler
 {
     public function __construct(
         private CategoryRepository $categoryRepository,
@@ -17,11 +18,11 @@ class CreateGalleryHandler
     {
     }
 
-    public function handle(Request $request): Gallery
+    public function handle(Request $request, FormInterface $form): Gallery
     {
         $inputBag = $request->request->all();
         $fileBag = $request->files->all();
-        $gallery = new Gallery();
+        $gallery = $form->getData();
 
         // inputBag
         $titleData = $inputBag['title'] ?? null;
@@ -55,7 +56,7 @@ class CreateGalleryHandler
         }
 
         // thumbnail
-        $thumbnail = new Thumbnail();
+        $thumbnail = $form->get('thumbnail')->getData() ?? new Thumbnail();
         if ($thumbnailFile) {
             $thumbnail->setImageFile($thumbnailFile);
         }
