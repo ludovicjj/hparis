@@ -22,8 +22,14 @@
             <div class="row">
                 {% for gallery in galleries %}
                     <div class="col-3 mb-4">
-                        <div class="card">
-                            <img src="{{ asset('uploads/thumbnails/' ~ gallery.thumbnail.imageName) }}" class="gallery-thumbnail" alt="thumbnail">
+                        <div class="card gallery-card">
+                            <a href="#" class="gallery-show h-100">
+                                <img src="{{ asset('uploads/thumbnails/' ~ gallery.thumbnail.imageName) }}" class="gallery-thumbnail" alt="thumbnail">
+                            </a>
+                            <div class="card-action">
+                                <a href="{{ path('admin_gallery_update', {id: gallery.id}) }}" title="Modifier"><i class="fa-regular fa-pen-to-square"></i></a>
+                                <a href="#" title="Supprimer"><i class="fa-solid fa-xmark"></i></a>
+                            </div>
                         </div>
                     </div>
                 {% endfor %}
