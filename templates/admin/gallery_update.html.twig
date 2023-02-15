@@ -22,7 +22,11 @@
             description : "Cette page vous permet de modifier une galerie.
             Veuillez noter que les champs suivis d'un astérisque (*) sont obligatoires et doivent être remplis pour que la mise à jour de la galerie soit possible.
             Pensez à sauvegarder quand vous êtes satisfait !",
-            breadcrumbs: [{'label': 'Admin','path': '#'},{'label': 'Gallery','path': '#'},{'label': 'Modifier','path': '#'}]
+            breadcrumbs: [
+                {'label': 'Admin','path': '#'},
+                {'label': 'Galerie','path': path('admin_gallery')},
+                {'label': 'Modifier','path': path('admin_gallery_update', {id: galleryId})}
+            ]
         }) }}
         <main class="container pt-4">
             <section>
