@@ -7,12 +7,20 @@ class PaginatedGallery
      *
      * @param {HTMLElement} galleryContainer
      * @param {HTMLElement} paginationContainer
+     * @param {HTMLElement} filterContainer
      */
-    constructor(galleryContainer, paginationContainer) {
+    constructor(galleryContainer, paginationContainer, filterContainer) {
         this.galleryContainer = galleryContainer
         this.paginationContainer = paginationContainer
+        this.filterContainer = filterContainer
+        this.category = null;
+
         this.itemPerPage = parseInt(this.galleryContainer.dataset.perPage)
-        this.url = this.galleryContainer.dataset.url
+        this.url = this.galleryContainer.dataset.url;
+
+        this.filterContainer.querySelectorAll('a.category').forEach(category => {
+            category.addEventListener('click', this.handleFilter.bind(this))
+        })
 
         this.buildPagination()
     }
@@ -37,6 +45,20 @@ class PaginatedGallery
     }
 
     /**
+     * @param {PointerEvent} e
+     */
+    handleFilter(e) {
+        e.preventDefault()
+        this.filterContainer.querySelector('a.category.active')?.classList.remove('active')
+        this.galleryContainer.dataset.page = '1'
+
+        e.currentTarget.classList.add('active');
+        this.category = e.currentTarget.dataset.category
+
+        this.loadGallery('1', this.category)
+    }
+
+    /**
      * Handle change page
      * @param {PointerEvent} e
      */
@@ -52,16 +74,25 @@ class PaginatedGallery
         this.galleryContainer.dataset.page = page
         this.galleryContainer.classList.add('loading')
         this.buildPagination()
-        this.loadGallery(page)
+        this.loadGallery(page, this.category)
     }
 
-    loadGallery(page) {
-        const url = this.url + `?page=${page}`
+    /**
+     * @param {string} page
+     * @param {string|null} category
+     */
+    loadGallery(page, category = null) {
+        let url = this.url + `?page=${page}` + (category ? `&c=${encodeURIComponent(category)}` : '')
         const options = {headers: { "Accept": "application/json"} }
         const fragment = document.getElementById('gallery-card-template').content
 
-        sendRequest(url, 'GET', options).then(galleries => {
+        sendRequest(url, 'GET', options).then(({galleries, total}) => {
             this.galleryContainer.replaceChildren();
+            if (galleries.length === 0) {
+                const alert = this.createAlert("Il n'y a aucune galerie associée à cette catégorie.")
+                this.galleryContainer.appendChild(alert);
+
+            }
             galleries.forEach(gallery => {
                 const cardTemplate = fragment.cloneNode(true)
                 cardTemplate.querySelector('.gallery-thumbnail').setAttribute('src', `/uploads/thumbnails/${gallery.thumbnail.imageName}`)
@@ -71,8 +102,11 @@ class PaginatedGallery
 
                 this.galleryContainer.appendChild(cardTemplate);
             })
-        }).catch(err => {
 
+            this.galleryContainer.dataset.total = (total).toString()
+            this.buildPagination()
+        }).catch(err => {
+            console.error(err)
         }).finally(_ => {
             this.galleryContainer.removeAttribute('style')
             this.galleryContainer.classList.remove('loading')
@@ -81,6 +115,20 @@ class PaginatedGallery
                 new Tooltip(tooltipTriggerEl)
             })
         })
+    }
+
+    /**
+     *
+     * @param message
+     * @return {HTMLDivElement}
+     */
+    createAlert(message) {
+        const alert = document.createElement('div')
+        alert.classList.add('alert', 'alert-primary')
+        alert.setAttribute('role', 'alert')
+        alert.innerText = message;
+
+        return alert
     }
 }
 

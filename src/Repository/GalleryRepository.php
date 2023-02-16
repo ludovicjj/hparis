@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Gallery;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -58,19 +59,25 @@ class GalleryRepository extends ServiceEntityRepository
 
     public function findPaginatedGallery(int $page): Paginator
     {
-        $query = $this->getGalleryWithLimit($page);
+        $qb = $this->getGalleryWithLimit($page);
 
-        return new Paginator($query);
+        return new Paginator($qb->getQuery());
     }
 
-    public function findGalleryByPage(int $page)
+    public function search(int $page, ?string $category = null): Paginator
     {
-        $query = $this->getGalleryWithLimit($page);
-
-        return $query->getResult();
+        $qb = $this->getGalleryWithLimit($page);
+        if ($category) {
+            $qb->innerJoin('g.categories', 'c')
+                ->andWhere('c.name LIKE :category')
+                ->setParameter('category', "%{$category}%");
+        }
+        //$query = $qb->getQuery();
+        return new Paginator($qb->getQuery());
+//        return $query->getResult();
     }
 
-    private function getGalleryWithLimit($page): Query
+    private function getGalleryWithLimit($page): QueryBuilder
     {
         $offset = ($page - 1) * self::ADMIN_ITEMS_PER_PAGE;
 
@@ -78,8 +85,7 @@ class GalleryRepository extends ServiceEntityRepository
             ->innerJoin('g.thumbnail', 't')
             ->addSelect('t')
             ->setFirstResult($offset)
-            ->setMaxResults(self::ADMIN_ITEMS_PER_PAGE)
-            ->getQuery();
+            ->setMaxResults(self::ADMIN_ITEMS_PER_PAGE);
     }
 
 //    /**

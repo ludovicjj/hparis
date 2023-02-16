@@ -8,5 +8,6 @@ document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(tooltipTriggerEl
 
 new PaginatedGallery(
     document.querySelector('.gallery'),
-    document.querySelector('.pagination')
+    document.querySelector('.pagination'),
+    document.querySelector('.categories')
 );

@@ -132,6 +132,7 @@ class AdminGalleryController extends AbstractController
     {
         if ($request->isXmlHttpRequest()) {
             $page = $request->query->getInt('page', 1);
+            $category = $request->query->get('c');
 
             if ($page < 1) {
                 return new JsonResponse([
@@ -140,9 +141,12 @@ class AdminGalleryController extends AbstractController
                 ], Response::HTTP_NOT_FOUND);
             }
 
-            $galleries = $galleryRepository->findGalleryByPage($page);
+            $paginatedGallery = $galleryRepository->search($page, $category);
+            $galleries = iterator_to_array($paginatedGallery);
+            $total = $paginatedGallery->count();
+
             $json = $serializer->serialize(
-                $galleries,
+                ['galleries' => $galleries, 'total' => $total],
                 'json',
                 [AbstractNormalizer::IGNORED_ATTRIBUTES => ['pictures', 'categories']]
             );

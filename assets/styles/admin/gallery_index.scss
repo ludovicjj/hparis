@@ -49,7 +49,7 @@ main.container {
 }
 
 // categories
-.category {
+.section-category {
     &:has(li) {
         margin-bottom: 2rem;
     }
@@ -62,5 +62,9 @@ main.container {
         flex-wrap: wrap;
         gap: .5rem;
         justify-content: center;
+        & a.btn.btn-main.category.active {
+            background-color: #fff;
+            color: var(--main-color)
+        }
     }
 }

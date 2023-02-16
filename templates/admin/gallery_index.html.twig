@@ -23,11 +23,15 @@
 
         <main class="container pt-4">
             <div class="row">
-                <section class="category">
-                    <ul>
-                        <li><a href="#" class="btn btn-main">Tous</a></li>
+                <section class="section-category">
+                    <ul class="categories">
+                        <li><a href="#" class="btn btn-main category active">Tous</a></li>
                         {% for category in categories %}
-                            <li><a href="#" class="btn btn-main">{{ category.name }}</a></li>
+                            <li>
+                                <a href="#" class="btn btn-main category" data-category="{{ category.name }}">
+                                    {{ category.name }}
+                                </a>
+                            </li>
                         {% endfor %}
                     </ul>
                 </section>
