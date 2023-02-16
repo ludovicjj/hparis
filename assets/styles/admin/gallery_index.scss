@@ -1,12 +1,11 @@
 @import '../components/header_wave';
 @import "../components/footer_wave";
+@import "../components/pagination_admin_style";
 
 main.container {
     flex-grow: 1;
 }
-
 .gallery-card {
-    //max-height: 150px;
     aspect-ratio: 1 / 1;
     overflow: hidden;
     position: relative;
@@ -24,19 +23,16 @@ main.container {
     flex-direction: column;
     gap: .5rem;
     & a {
-        //color: #fff;
         color: var(--main-color);
         background-color: rgba(255, 255, 255, 0.3);
         border: 1px solid rgba(255, 255, 255, .5);
         width: 2rem;
         height: 2rem;
-
-        //border-radius: .375rem;
         border-radius: 50%;
         transition:
-                background-color .3s ease-in-out,
-                color .3s ease-in-out;
-
+            background-color .3s ease-in-out,
+            color .3s ease-in-out,
+            border .3s ease-in-out;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -44,11 +40,27 @@ main.container {
     & a:hover {
         color: #fff;
         background-color: var(--main-color);
+        border: 1px solid var(--main-color);
     }
 }
-//.gallery-show {
-//    transition: opacity .3s ease-in-out;
-//}
-//.gallery-show:hover {
-//    opacity: .5;
-//}
+// tooltip
+.custom-tooltip {
+    --bs-tooltip-bg: var(--main-color);
+}
+
+// categories
+.category {
+    &:has(li) {
+        margin-bottom: 2rem;
+    }
+    & ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: .5rem;
+        justify-content: center;
+    }
+}
