@@ -149,34 +149,6 @@ class PaginatedPicture {
         })
     }
 
-    // /**
-    //  *
-    //  * @param {string} url
-    //  * @param {string} method
-    //  * @param {Object} options
-    //  * @return {Promise<Object[]>}
-    //  */
-    // async sendRequest(url, method, options = {}) {
-    //     const params = {
-    //         method,
-    //         headers: {
-    //             'X-Requested-With': 'XMLHttpRequest',
-    //             ...options?.headers
-    //         },
-    //         body: options?.body
-    //     }
-    //
-    //     const response = await fetch(url, params)
-    //     const data = response.headers.get('content-type') === 'application/json' ? await response.json() : []
-    //
-    //     if (response.ok) {
-    //         return Promise.resolve(data)
-    //     } else {
-    //         return Promise.reject(data)
-    //     }
-    //
-    // }
-
     /**
      *
      * @param {string} message
