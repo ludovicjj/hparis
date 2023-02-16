@@ -1,5 +1,7 @@
 {% extends 'admin/base_admin.html.twig' %}
 
+{% block title %}{{ parent() }} - Galeries{% endblock %}
+
 {% block stylesheets %}
     {{ parent() }}
     {{ encore_entry_link_tags('admin_gallery_index') }}
@@ -14,26 +16,64 @@
     <div class="page-wrapper">
         {{ include ('partials/_wave_header.html.twig', {
             title : 'Vos galeries',
-            description : "Voici l'ensemble des galeries actuellement presente sur le site.",
-            breadcrumbs: [{'label': 'Admin','path': '#'},{'label': 'Galerie','path': path('admin_gallery')}]
+            description : "Voici l'ensemble des galeries actuellement présentes sur le site. Vous pouvez filtrer les galeries par categories qui se trouvent ci-dessous.",
+            breadcrumbs: [{'label': 'Admin','path': '#'},{'label': 'Galerie','path': path('admin_gallery')}],
+            actions: [{'label': 'Ajouter une galerie','path': path('admin_gallery_create')}]
         }) }}
 
         <main class="container pt-4">
             <div class="row">
-                {% for gallery in galleries %}
-                    <div class="col-3 mb-4">
-                        <div class="card gallery-card">
-                            <a href="#" class="gallery-show h-100">
-                                <img src="{{ asset('uploads/thumbnails/' ~ gallery.thumbnail.imageName) }}" class="gallery-thumbnail" alt="thumbnail">
-                            </a>
-                            <div class="card-action">
-                                <a href="{{ path('admin_gallery_update', {id: gallery.id}) }}" title="Modifier"><i class="fa-regular fa-pen-to-square"></i></a>
-                                <a href="#" title="Supprimer"><i class="fa-solid fa-xmark"></i></a>
+                <section class="category">
+                    <ul>
+                        <li><a href="#" class="btn btn-main">Tous</a></li>
+                        {% for category in categories %}
+                            <li><a href="#" class="btn btn-main">{{ category.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </section>
+                <section class="section-gallery">
+                    <div class="row gallery"
+                         data-per-page="{{ per_page }}"
+                         data-url="{{ path('api_gallery_search') }}"
+                         data-page="1"
+                         data-total="{{ total }}"
+                    >
+                        {% for gallery in galleries %}
+                            <div class="col-3 mb-4">
+                                <div class="card gallery-card">
+                                    <a href="#" class="gallery-show h-100">
+                                        <img src="{{ asset('uploads/thumbnails/' ~ gallery.thumbnail.imageName) }}" class="gallery-thumbnail" alt="thumbnail">
+                                    </a>
+                                    <div class="card-action">
+                                        <a
+                                            href="{{ path('admin_gallery_update', {id: gallery.id}) }}"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="left"
+                                            data-bs-custom-class="custom-tooltip"
+                                            data-bs-title="Modifier la galerie."
+                                        >
+                                            <i class="fa-regular fa-pen-to-square"></i>
+                                        </a>
+                                        <a
+                                            href="#"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="left"
+                                            data-bs-custom-class="custom-tooltip"
+                                            data-bs-title="Supprimer la galerie."
+                                        >
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        {% endfor %}
                     </div>
-                {% endfor %}
+                    <nav aria-label="gallery navigation">
+                        <ul class="pagination justify-content-center"></ul>
+                    </nav>
+                </section>
             </div>
+            {{ include('partials/_gallery_card_template.html.twig') }}
         </main>
         {{ include('partials/_footer_wave.html.twig') }}
     </div>
