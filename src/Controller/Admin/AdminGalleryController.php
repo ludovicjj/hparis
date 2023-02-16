@@ -6,6 +6,7 @@ use App\Builder\ErrorsValidationBuilder;
 use App\Entity\Gallery;
 use App\Form\Handler\GalleryHandler;
 use App\Form\Type\GalleryType;
+use App\Repository\CategoryRepository;
 use App\Repository\GalleryRepository;
 use App\Repository\PictureRepository;
 use App\Service\PictureCleaner;
@@ -17,26 +18,34 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
-#[Route('/admin', name: 'admin_')]
 #[IsGranted("ROLE_ADMIN")]
 class AdminGalleryController extends AbstractController
 {
-    #[Route('/gallery', name: 'gallery')]
+    #[Route('/admin/gallery', name: 'admin_gallery')]
     public function index(
-        GalleryRepository $galleryRepository
+        GalleryRepository $galleryRepository,
+        CategoryRepository $categoryRepository,
     ): Response
     {
-        $galleries = $galleryRepository->findGalleryList();
+        $categories = $categoryRepository->findAll();
+        $paginatedGallery = $galleryRepository->findPaginatedGallery(1);
+        $galleryCount = $paginatedGallery->count();
+        $galleries = iterator_to_array($paginatedGallery);
 
         return $this->render('admin/gallery_index.html.twig', [
-            'galleries' => $galleries
+            'galleries'     => $galleries,
+            'categories'    => $categories,
+            'total'         => $galleryCount,
+            'per_page'      => GalleryRepository::ADMIN_ITEMS_PER_PAGE
         ]);
     }
 
-    #[Route('/gallery/create', name: 'gallery_create')]
+    #[Route('/admin/gallery/create', name: 'admin_gallery_create')]
     public function create(
         Request                $request,
         GalleryHandler         $galleryHandler,
@@ -67,7 +76,7 @@ class AdminGalleryController extends AbstractController
         ]);
     }
 
-    #[Route('/gallery/update/{id}', name: 'gallery_update')]
+    #[Route('/admin/gallery/update/{id}', name: 'admin_gallery_update')]
     public function update(
         Request            $request,
         int                $id,
@@ -112,5 +121,42 @@ class AdminGalleryController extends AbstractController
             'per_page'      => PictureRepository::ITEMS_PER_PAGE,
             'galleryId'     => $id
         ]);
+    }
+
+    #[Route('/api/galleries/search', name: 'api_gallery_search', methods: ['GET'])]
+    public function search(
+        Request $request,
+        GalleryRepository $galleryRepository,
+        SerializerInterface $serializer
+    ): Response
+    {
+        if ($request->isXmlHttpRequest()) {
+            $page = $request->query->getInt('page', 1);
+
+            if ($page < 1) {
+                return new JsonResponse([
+                    "message" => "Page Not Found",
+                    "code" => Response::HTTP_NOT_FOUND
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            $galleries = $galleryRepository->findGalleryByPage($page);
+            $json = $serializer->serialize(
+                $galleries,
+                'json',
+                [AbstractNormalizer::IGNORED_ATTRIBUTES => ['pictures', 'categories']]
+            );
+
+            return new JsonResponse($json, Response::HTTP_OK, [], true);
+
+        }
+
+        return $this->sendInvalidHeader();
+    }
+
+    private function sendInvalidHeader(): Response
+    {
+        $data = ['message' => "Bad request: Invalid Headers", 'code' => Response::HTTP_BAD_REQUEST];
+        return new JsonResponse($data, Response::HTTP_BAD_REQUEST);
     }
 }
