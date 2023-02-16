@@ -22,6 +22,8 @@ class GalleryHandler
     {
         $inputBag = $request->request->all();
         $fileBag = $request->files->all();
+
+        /** @var Gallery $gallery */
         $gallery = $form->getData();
 
         // inputBag
@@ -37,6 +39,11 @@ class GalleryHandler
         $gallery->setTitle($titleData);
 
         // category
+        $collectionCategories = $gallery->getCategories();
+        if (!$collectionCategories->isEmpty()) {
+            $collectionCategories->clear();
+        }
+
         foreach ($categoryId as $id) {
             $category = $this->categoryRepository->find($id);
             if ($category) {
