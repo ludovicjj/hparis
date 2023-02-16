@@ -3,7 +3,7 @@
 {% form_theme form _self %}
 {% use "form/vich_image_widget.html.twig" %}
 
-{% block title %}{{ parent() }}: modifier galerie{% endblock %}
+{% block title %}{{ parent() }} - Modifier Galerie{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -26,7 +26,8 @@
                 {'label': 'Admin','path': '#'},
                 {'label': 'Galerie','path': path('admin_gallery')},
                 {'label': 'Modifier','path': path('admin_gallery_update', {id: galleryId})}
-            ]
+            ],
+            actions: [{'label': 'Retour à mes galeries','path': path('admin_gallery')}]
         }) }}
         <main class="container pt-4">
             <section>

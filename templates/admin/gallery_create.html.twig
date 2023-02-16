@@ -2,7 +2,7 @@
 {% form_theme form _self %}
 {% use "form/vich_image_widget.html.twig" %}
 
-{% block title %}{{ parent() }}-Galerie{% endblock %}
+{% block title %}{{ parent() }} - Ajouter Galerie{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -25,7 +25,8 @@
                 {'label': 'Admin','path': '#'},
                 {'label': 'Gallery','path': path('admin_gallery')},
                 {'label': 'Ajouter','path': path('admin_gallery_create')}
-            ]
+            ],
+            actions: [{'label': 'Retour à mes galeries','path': path('admin_gallery')}]
         }) }}
 
         <main class="container pt-4">
