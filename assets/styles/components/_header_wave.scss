@@ -7,6 +7,15 @@
     }
     color: #fff;
 }
+// fix spacing for action btn
+.wave-header .container {
+    padding-bottom: .5rem;
+}
+
+// action
+.wave-header .wave-header_action a:hover {
+    color: var(--main-color);
+}
 
 // Breadcrumb
 .wave-header .breadcrumb {
