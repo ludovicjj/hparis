@@ -1,7 +1,8 @@
+import { getPaginationLinks, getPaginationHTML, sendRequest } from "./PaginationHelper";
+
 class PaginatedPicture {
 
     /**
-     *
      * @param {HTMLElement} pictureContainer
      * @param {HTMLElement} paginationContainer
      */
@@ -23,78 +24,18 @@ class PaginatedPicture {
         this.totalItems = parseInt(this.pictureContainer.dataset.total)
         this.totalPage = Math.ceil(this.totalItems / this.itemPerPage);
 
-        let paginationLinks = this.getPaginationLinks(currentPage, this.totalPage);
+        let paginationLinks = getPaginationLinks(currentPage, this.totalPage);
         this.paginationContainer.replaceChildren();
 
         paginationLinks.forEach(link => {
-            const linkHTML = this.getPaginationHTML(link, currentPage)
+            const linkHTML = getPaginationHTML(link, currentPage)
+
+            if (!linkHTML.classList.contains('disabled')) {
+                linkHTML.addEventListener('click', this.changePage.bind(this))
+            }
+
             this.paginationContainer.appendChild(linkHTML)
         })
-    }
-
-    /**
-     * get pages with range
-     * @param {number} currentPage
-     * @param {number} totalPage
-     * @return {array}
-     */
-    getPaginationLinks(currentPage, totalPage) {
-        const delta = 2;
-        const pages = [...Array(totalPage + 1).keys()].slice(1);
-        const index = pages.findIndex(page => page === currentPage);
-        const start = Math.max(index - delta, 0)
-        const end = Math.min(index + delta + 1, totalPage - 1)
-        const range = (totalPage - delta) -1
-
-        if ( range < delta) {
-            return [...pages.slice(0)];
-        }
-
-        let links
-        if (currentPage < range) {
-            links = [...pages.slice(start, end), '...', totalPage];
-        } else {
-            links = [...pages.slice(start, end), totalPage];
-        }
-
-        if (links.findIndex(page => page === 2) === -1) {
-            links = ['...', ...links];
-        }
-        if (links.findIndex(page => page === 1) === -1) {
-            links = [1, ...links];
-        }
-        return links;
-    }
-
-    /**
-     * Build Bootstrap-style pagination links
-     * @param page
-     * @param currentPage
-     * @return {HTMLLIElement}
-     */
-    getPaginationHTML(page, currentPage) {
-        let a = document.createElement('a');
-        a.classList.add('page-link')
-        a.innerText = page;
-        a.setAttribute('href', '#')
-
-        let li = document.createElement('li');
-        li.classList.add('page-item')
-        li.dataset.page = page
-        if (Number.isNaN(Number(page))) {
-            li.classList.add('disabled');
-        }
-
-        if (parseInt(currentPage) === page) {
-            li.classList.add('active')
-        }
-        li.appendChild(a)
-
-        if (!li.classList.contains('disabled')) {
-            li.addEventListener('click', this.changePage.bind(this))
-        }
-
-        return li;
     }
 
     /**
@@ -123,7 +64,7 @@ class PaginatedPicture {
         const url = this.url + `?page=${page}&id=${this.galleryId}`
         const options = {headers: { "Accept": "application/json"} }
 
-        this.sendRequest(url, 'GET', options).then(pictures => {
+        sendRequest(url, 'GET', options).then(pictures => {
             this.pictureContainer.replaceChildren();
             pictures.forEach(({id, imageName}) => {
                 this.createPicture(id, imageName)
@@ -181,7 +122,7 @@ class PaginatedPicture {
         const url = this.url + `/${pictureId}`
         const options = { headers: {"Content-Type": "application/json", "Accept": "application/json"}, body}
 
-        this.sendRequest(url, 'DELETE', options)
+        sendRequest(url, 'DELETE', options)
             .then(nextPictures => {
                 const updatedTotal = this.totalItems - 1
                 this.pictureContainer.dataset.total = (updatedTotal).toString()
@@ -208,33 +149,33 @@ class PaginatedPicture {
         })
     }
 
-    /**
-     *
-     * @param {string} url
-     * @param {string} method
-     * @param {Object} options
-     * @return {Promise<Object[]>}
-     */
-    async sendRequest(url, method, options = {}) {
-        const params = {
-            method,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                ...options?.headers
-            },
-            body: options?.body
-        }
-
-        const response = await fetch(url, params)
-        const data = response.headers.get('content-type') === 'application/json' ? await response.json() : []
-
-        if (response.ok) {
-            return Promise.resolve(data)
-        } else {
-            return Promise.reject(data)
-        }
-
-    }
+    // /**
+    //  *
+    //  * @param {string} url
+    //  * @param {string} method
+    //  * @param {Object} options
+    //  * @return {Promise<Object[]>}
+    //  */
+    // async sendRequest(url, method, options = {}) {
+    //     const params = {
+    //         method,
+    //         headers: {
+    //             'X-Requested-With': 'XMLHttpRequest',
+    //             ...options?.headers
+    //         },
+    //         body: options?.body
+    //     }
+    //
+    //     const response = await fetch(url, params)
+    //     const data = response.headers.get('content-type') === 'application/json' ? await response.json() : []
+    //
+    //     if (response.ok) {
+    //         return Promise.resolve(data)
+    //     } else {
+    //         return Promise.reject(data)
+    //     }
+    //
+    // }
 
     /**
      *
