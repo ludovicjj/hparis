@@ -1,0 +1,30 @@
+<template id="gallery-card-template">
+    <div class="col-3 mb-4">
+        <div class="card gallery-card">
+            <a href="#" class="gallery-show h-100">
+                <img src="#" class="gallery-thumbnail" alt="thumbnail">
+            </a>
+            <div class="card-action">
+                <a
+                        href="{{ path('admin_gallery_update', {id: '@id'}) }}"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="left"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title="Modifier la galerie."
+                        class="gallery-update"
+                >
+                    <i class="fa-regular fa-pen-to-square"></i>
+                </a>
+                <a
+                        href="#"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="left"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title="Supprimer la galerie."
+                >
+                    <i class="fa-solid fa-xmark"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</template>
