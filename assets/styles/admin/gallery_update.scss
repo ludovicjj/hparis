@@ -64,3 +64,14 @@
 .page-item {
     margin: 1rem 0;
 }
+.page-wrapper {
+    position: relative;
+}
+.page-wrapper.loading::after {
+    content: "";
+    position: fixed;
+    z-index: 10;
+    background: rgba(0,0,0,.4) url('../../images/loader.svg') center / contain no-repeat;
+    background-size: 4rem;
+    inset: 0;
+}

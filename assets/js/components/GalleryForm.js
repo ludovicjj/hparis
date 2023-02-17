@@ -59,6 +59,8 @@ class GalleryForm {
             } else {
                 options.text = 'Votre galerie a été modifiée avec success !'
                 Swal.fire(options).then(_ => {
+                    this.disableSubmit(true);
+                    document.querySelector('.page-wrapper').classList.add('loading')
                     location.assign(this.form.dataset.redirect)
                 })
             }
