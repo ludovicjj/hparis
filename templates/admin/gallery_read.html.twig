@@ -1,0 +1,63 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}{{ parent() }} - Galerie{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('admin_gallery_read') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('admin_gallery_read') }}
+{% endblock %}
+
+{% block body %}
+    {% set visibility = (gallery.state) ? 'publique' : 'privée' %}
+    <div class="page-wrapper">
+        {{ include ('partials/_wave_header.html.twig', {
+            title : 'Galerie: ' ~  gallery.title,
+            description : "Voici l'ensemble des images qui sont présentes dans la galerie. Actuellement la galerie est <span class='state'>" ~ visibility ~"</span>",
+            breadcrumbs: [
+                {'label': 'Admin','path': '#'},
+                {'label': 'Galerie','path': path('admin_gallery')},
+                {'label': gallery.title, 'path': path('admin_gallery_read', {id: gallery.id})}
+            ],
+            actions: [
+                {'label': 'Retour à mes galeries','path': path('admin_gallery')},
+                {'label': 'Modifier la galerie', 'path': path('admin_gallery_update', {id: gallery.id})}
+            ],
+            thumbnail: {'path': asset('uploads/thumbnails/' ~ gallery.thumbnail.imageName)},
+            categories_tag: gallery.categories
+        }) }}
+        <main class="container pt-4">
+            <div class="row">
+                <div class="col-12 d-md-none thumbnail">
+                    <img src="{{ asset('uploads/thumbnails/' ~ gallery.thumbnail.imageName) }}" alt="thumbnail">
+                    <hr class="border border-1 opacity-50 d-block d-md-none">
+                </div>
+
+                {% if gallery.pictures is empty %}
+                    <div class="alert alert-primary mx-2" role="alert">
+                        <span class="missing">
+                            <i class="fa-regular fa-circle-question"></i>
+                        </span>
+                        <p>
+                            Cette galerie ne contient aucune image pour le moment. Vous pouvez en rajouter en modifiant la galerie.
+                        </p>
+                        <a class="btn btn-main" href="{{ path('admin_gallery_update', {id: gallery.id}) }}">Modifier la galerie</a>
+                    </div>
+                {% else %}
+                    {% for picture in gallery.pictures %}
+                        <div class="col-6 col-sm-4 col-md-3 mb-4">
+                            <div class="card gallery-card">
+                                <img src="{{ asset('uploads/pictures/' ~ picture.imageName) }}" class="picture" alt="">
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </main>
+        {{ include('partials/_footer_wave.html.twig') }}
+    </div>
+{% endblock %}

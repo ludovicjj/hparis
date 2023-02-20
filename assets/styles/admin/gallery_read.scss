@@ -1,0 +1,39 @@
+@import '../components/header_wave';
+@import "../components/footer_wave";
+
+main.container {
+    flex-grow: 1;
+}
+
+// thumbnail
+.thumbnail {
+    aspect-ratio: 3 / 2;
+    & img {
+        display: block;
+        border-radius: .5rem;
+        height: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        box-shadow: 0 0 25px var(--box-shadow-medium-rgba);
+        object-fit: cover;
+    }
+}
+
+.gallery-card {
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    & .picture {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+    }
+}
+
+// alert empty pictures
+.alert {
+    flex: 1 1 auto;
+    text-align: center;
+    & .missing {
+        font-size: 1.5rem;
+    }
+}

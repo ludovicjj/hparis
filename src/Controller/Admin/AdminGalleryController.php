@@ -123,6 +123,23 @@ class AdminGalleryController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/gallery/{id}', name: 'admin_gallery_read')]
+    public function read(
+        int $id,
+        GalleryRepository $galleryRepository
+    ): Response
+    {
+        $gallery = $galleryRepository->find($id);
+
+        if (!$gallery) {
+            throw new NotFoundHttpException('Gallery not found');
+        }
+
+        return $this->render('admin/gallery_read.html.twig', [
+            'gallery' => $gallery
+        ]);
+    }
+
     #[Route('/api/galleries/search', name: 'api_gallery_search', methods: ['GET'])]
     public function search(
         Request $request,
