@@ -4,6 +4,7 @@
 @import "../components/custom_checkbox";
 @import "../components/drop_file";
 @import "../components/footer_wave";
+@import "../components/pagination_admin_style";
 
 .picture {
     display: grid;
@@ -60,20 +61,17 @@
     z-index: 2;
 }
 
-// pagination
-.pagination {
-    & .active > .page-link {
-        color: #fff;
-        background-color: var(--main-color);
-        border-color: var(--main-color);
-    }
-    & .active > .page-link:hover {
-        background-color: var(--main-dark-color);
-    }
-    .page-link {
-        color: var(--main-color);
-    }
-}
 .page-item {
     margin: 1rem 0;
+}
+.page-wrapper {
+    position: relative;
+}
+.page-wrapper.loading::after {
+    content: "";
+    position: fixed;
+    z-index: 10;
+    background: rgba(0,0,0,.4) url('../../images/loader.svg') center / contain no-repeat;
+    background-size: 4rem;
+    inset: 0;
 }

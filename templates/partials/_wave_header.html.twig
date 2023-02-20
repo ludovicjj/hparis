@@ -13,6 +13,13 @@
                     <p>
                         {{ description }}
                     </p>
+                    {% if actions is defined %}
+                        <div class="wave-header_action">
+                            {% for action in actions %}
+                                <a href="{{ action.path }}" class="btn btn-outline-light">{{ action.label }}</a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

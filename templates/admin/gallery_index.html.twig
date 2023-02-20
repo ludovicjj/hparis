@@ -1,5 +1,7 @@
 {% extends 'admin/base_admin.html.twig' %}
 
+{% block title %}{{ parent() }} - Galeries{% endblock %}
+
 {% block stylesheets %}
     {{ parent() }}
     {{ encore_entry_link_tags('admin_gallery_index') }}
@@ -11,27 +13,72 @@
 {% endblock %}
 
 {% block body %}
+    <div class="page-wrapper">
+        {{ include ('partials/_wave_header.html.twig', {
+            title : 'Vos galeries',
+            description : "Voici l'ensemble des galeries actuellement présentes sur le site. Vous pouvez filtrer les galeries par categories qui se trouvent ci-dessous.",
+            breadcrumbs: [{'label': 'Admin','path': '#'},{'label': 'Galerie','path': path('admin_gallery')}],
+            actions: [{'label': 'Ajouter une galerie','path': path('admin_gallery_create')}]
+        }) }}
 
-    <div class="container">
-        <h1>Masonry</h1>
-        <p>test 1</p>
-
-        <h1>Masonry</h1>
-        <p>test 2</p>
-        <button type="button" id="add-item" class="btn btn-main">Add</button>
-
-        <div class="row grid" style="margin-bottom: 10rem; margin-top: 3rem">
-            <div class="grid-sizer"></div>
-            {% for i in 125..133 %}
-                {% if i is even %}
-                    <div class="grid-item col-6 col-md-4 col-xl-3 pb-3 px-2 small">
-                {% else %}
-                    <div class="grid-item col-6 col-md-4 col-xl-3 pb-3 px-2 medium">
-                {% endif %}
-{#                        <img src="{{ 'https://picsum.photos/id/' ~ i ~ '/300/400'}}" alt="">#}
-                        <img src="{{ 'https://source.unsplash.com/random/?fruit&'~i }}" alt="">
+        <main class="container pt-4">
+            <div class="row">
+                <section class="section-category">
+                    <ul class="categories">
+                        <li><a href="#" class="btn btn-main category active">Tous</a></li>
+                        {% for category in categories %}
+                            <li>
+                                <a href="#" class="btn btn-main category" data-category="{{ category.name }}">
+                                    {{ category.name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+                <section class="section-gallery">
+                    <div class="row gallery"
+                         data-per-page="{{ per_page }}"
+                         data-url="{{ path('api_gallery_search') }}"
+                         data-page="1"
+                         data-total="{{ total }}"
+                    >
+                        {% for gallery in galleries %}
+                            <div class="col-6 col-sm-4 col-md-3 mb-4">
+                                <div class="card gallery-card">
+                                    <a href="#" class="gallery-show h-100">
+                                        <img src="{{ asset('uploads/thumbnails/' ~ gallery.thumbnail.imageName) }}" class="gallery-thumbnail" alt="thumbnail">
+                                    </a>
+                                    <div class="card-action">
+                                        <a
+                                            href="{{ path('admin_gallery_update', {id: gallery.id}) }}"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="left"
+                                            data-bs-custom-class="custom-tooltip"
+                                            data-bs-title="Modifier la galerie."
+                                        >
+                                            <i class="fa-regular fa-pen-to-square"></i>
+                                        </a>
+                                        <a
+                                            href="#"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="left"
+                                            data-bs-custom-class="custom-tooltip"
+                                            data-bs-title="Supprimer la galerie."
+                                        >
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
-            {% endfor %}
-        </div>
+                    <nav aria-label="gallery navigation">
+                        <ul class="pagination justify-content-center"></ul>
+                    </nav>
+                </section>
+            </div>
+            {{ include('partials/_gallery_card_template.html.twig') }}
+        </main>
+        {{ include('partials/_footer_wave.html.twig') }}
     </div>
 {% endblock %}

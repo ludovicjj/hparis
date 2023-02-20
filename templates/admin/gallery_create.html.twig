@@ -2,7 +2,7 @@
 {% form_theme form _self %}
 {% use "form/vich_image_widget.html.twig" %}
 
-{% block title %}{{ parent() }}-Galerie{% endblock %}
+{% block title %}{{ parent() }} - Ajouter Galerie{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -15,15 +15,18 @@
 {% endblock %}
 
 {% block body %}
-    {% set breadcrumb = [{'label': 'Admin','path': '#'},{'label': 'Gallery','path': '#'},{'label': 'Ajouter','path': '#'}] %}
-
     <div class="page-wrapper">
         {{ include ('partials/_wave_header.html.twig', {
             title : 'Ajouter une galerie',
             description : "Cette page vous permet de créer votre propre galerie.
             Veuillez noter que les champs suivis d'un astérisque (*) sont obligatoires et doivent être remplis pour que la création de la galerie soit possible.
             Pensez à sauvegarder quand vous êtes satisfait !",
-            breadcrumbs: [{'label': 'Admin','path': '#'},{'label': 'Gallery','path': '#'},{'label': 'Ajouter','path': '#'}]
+            breadcrumbs: [
+                {'label': 'Admin','path': '#'},
+                {'label': 'Gallery','path': path('admin_gallery')},
+                {'label': 'Ajouter','path': path('admin_gallery_create')}
+            ],
+            actions: [{'label': 'Retour à mes galeries','path': path('admin_gallery')}]
         }) }}
 
         <main class="container pt-4">

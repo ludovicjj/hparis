@@ -1,0 +1,14 @@
+// pagination
+.pagination {
+    & .active > .page-link {
+        color: #fff;
+        background-color: var(--main-color);
+        border-color: var(--main-color);
+    }
+    & .active > .page-link:hover {
+        background-color: var(--main-dark-color);
+    }
+    .page-link {
+        color: var(--main-color);
+    }
+}
