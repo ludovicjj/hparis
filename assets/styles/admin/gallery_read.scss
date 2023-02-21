@@ -38,6 +38,13 @@ main.container {
     }
 }
 
+// intersection-observer
+.intersection-watcher {
+    width: 100%;
+    height: 100px;
+    background-color: red;
+}
+
 @media (min-width: 1200px) {
     .wave-header {
         margin-bottom: 4rem;

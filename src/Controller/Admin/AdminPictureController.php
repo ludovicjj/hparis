@@ -59,8 +59,9 @@ class AdminPictureController extends AbstractController
     ): Response
     {
         if ($request->isXmlHttpRequest()) {
-            $page = $request->query->get('page', 1);
-            $galleryId = $request->query->get('id');
+            $page = $request->query->getInt('page', 1);
+            $galleryId = $request->query->getInt('id');
+            $count = $request->query->getInt('count', PictureRepository::ITEMS_PER_PAGE);
 
             if ($page < 1) {
                 return new JsonResponse([
@@ -69,7 +70,7 @@ class AdminPictureController extends AbstractController
                 ], Response::HTTP_NOT_FOUND);
             }
 
-            $pictures = $pictureRepository->searchPictureByPageAndGallery($galleryId, $page);
+            $pictures = $pictureRepository->searchPictureByPageAndGallery($galleryId, $page, $count);
 
             $data = $serializer->serialize(
                 $pictures,

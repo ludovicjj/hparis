@@ -48,13 +48,18 @@
                         <a class="btn btn-main" href="{{ path('admin_gallery_update', {id: gallery.id}) }}">Modifier la galerie</a>
                     </div>
                 {% else %}
-                    {% for picture in gallery.pictures %}
-                        <div class="col-6 col-sm-4 col-md-3 mb-4">
-                            <div class="card gallery-card">
-                                <img src="{{ asset('uploads/pictures/' ~ picture.imageName) }}" class="picture" alt="">
-                            </div>
+                    <div class="picture-container container" data-gallery="{{ gallery.id }}" data-page="1" data-url="{{ path('api_picture_search') }}">
+                        <div class="row">
+                            {% for picture in gallery.pictures %}
+                                <div class="col-6 col-sm-4 col-md-3 mb-4">
+                                    <div class="card gallery-card">
+                                        <img src="{{ asset('uploads/pictures/' ~ picture.imageName) }}" class="picture" alt="Gallery Picture">
+                                    </div>
+                                </div>
+                            {% endfor %}
                         </div>
-                    {% endfor %}
+                        <div class="intersection-watcher"></div>
+                    </div>
                 {% endif %}
             </div>
         </main>
