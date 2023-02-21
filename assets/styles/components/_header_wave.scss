@@ -43,19 +43,21 @@
 
 // thumbnail
 .wave-header_thumbnail {
-    width: 200px;
-    height: 200px;
-    border-radius: .5rem;
-    overflow: hidden;
     position: relative;
-    z-index: 2;
-    margin: 1.5rem auto 0;
-    box-shadow: 0 0 25px var(--box-shadow-medium-rgba);
+    max-height: 2px;
+    width: 200px;
     & img {
+        position: absolute;
+        top:0;
+        right: 0;
+        z-index: 2;
+
         display: block;
-        width: 100%;
-        height: 100%;
+        width: 200px;
+        height: 200px;
         object-fit: cover;
+        box-shadow: 0 0 25px var(--box-shadow-medium-rgba);
+        border-radius: .5rem;
     }
 }
 
@@ -114,23 +116,20 @@
         height: 100px;
     }
     .wave-header_thumbnail {
-        bottom: -60px;
-        margin-top: 0;
-        min-width: 200px;
-        height: 200px;
+        min-width: 250px;
+        img {
+            width: 250px;
+            height: 250px;
+        }
     }
 }
 @media (min-width: 992px) {
-    .wave-header_wrapper {
-        flex-direction: row;
-    }
-    .wave-header_content:has(.wave-header_thumbnail) {
-        max-width: 70%;
-    }
     .wave-header_thumbnail {
-        bottom: -70px;
         min-width: 285px;
-        height: 285px;
+        img {
+            width: 285px;
+            height: 285px;
+        }
     }
 
     .wave-header .wave {
@@ -142,7 +141,11 @@
 }
 @media (min-width: 1200px) {
     .wave-header_thumbnail {
-        min-width: 310px;
-        height: 310px;
+        // 310
+        min-width: 340px;
+        img {
+            width: 340px;
+            height: 340px;
+        }
     }
 }
