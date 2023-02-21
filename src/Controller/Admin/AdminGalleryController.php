@@ -129,7 +129,7 @@ class AdminGalleryController extends AbstractController
         GalleryRepository $galleryRepository
     ): Response
     {
-        $gallery = $galleryRepository->find($id);
+        $gallery = $galleryRepository->findGalleryRead($id);
 
         if (!$gallery) {
             throw new NotFoundHttpException('Gallery not found');

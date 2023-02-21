@@ -57,6 +57,23 @@ class GalleryRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    public function findGalleryRead(int $id): ?Gallery
+    {
+        return $this->createQueryBuilder('g')
+            ->andWhere('g.id = :id')
+            ->setParameter('id', $id)
+            ->innerJoin('g.thumbnail', 't')
+            ->addSelect('t')
+            ->leftJoin('g.categories', 'c')
+            ->addSelect('c')
+            ->leftJoin('g.pictures', 'p')
+            ->addSelect('p')
+            ->setFirstResult(0)
+            ->setMaxResults(12)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     public function findPaginatedGallery(int $page): Paginator
     {
         $qb = $this->getGalleryWithLimit($page);
@@ -72,9 +89,8 @@ class GalleryRepository extends ServiceEntityRepository
                 ->andWhere('c.name LIKE :category')
                 ->setParameter('category', "%{$category}%");
         }
-        //$query = $qb->getQuery();
+
         return new Paginator($qb->getQuery());
-//        return $query->getResult();
     }
 
     private function getGalleryWithLimit($page): QueryBuilder
