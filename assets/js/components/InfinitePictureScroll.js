@@ -1,3 +1,5 @@
+import {Lightbox} from "./Lightbox";
+
 export class InfinitePictureScroll {
     /**
      *
@@ -9,6 +11,8 @@ export class InfinitePictureScroll {
         this.perPage = perPage
         this.watcher = document.querySelector(watcherClassName)
         this.container = document.querySelector(containerClassName)
+
+        this.lightbox = new Lightbox()
 
         if (!this.watcher || !this.container) {
             return
@@ -35,9 +39,10 @@ export class InfinitePictureScroll {
         const data = await this.fetchData(url);
 
         if (data) {
-            data.forEach(({imageName}) => {
-                this.createPicture(imageName)
+            const links = data.map(({imageName}) => {
+                return this.createPicture(imageName)
             })
+            this.lightbox.add(links)
             if (!data.length || data.length !== this.perPage) {
                 this.watcher.remove()
             }
@@ -66,13 +71,18 @@ export class InfinitePictureScroll {
         const card = document.createElement('div')
         card.classList.add('card', 'gallery-card')
 
-        const picture = document.createElement('img')
-        picture.className = 'picture'
-        picture.setAttribute('alt', 'Gallery Picture')
-        picture.setAttribute('src', `/uploads/pictures/${imageName}`)
+        const link = document.createElement('a')
+        link.setAttribute('href', `/uploads/pictures/${imageName}`)
 
-        card.appendChild(picture)
+        const picture = new Image()
+        picture.className = 'picture'
+        picture.src =`/uploads/pictures/${imageName}`
+
+        link.appendChild(picture)
+        card.appendChild(link)
         div.appendChild(card)
         this.container.querySelector('.row').appendChild(div)
+
+        return link
     }
 }

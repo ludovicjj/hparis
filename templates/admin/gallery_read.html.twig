@@ -53,13 +53,18 @@
                             {% for picture in gallery.pictures %}
                                 <div class="col-6 col-sm-4 col-md-3 mb-4">
                                     <div class="card gallery-card">
-                                        <img src="{{ asset('uploads/pictures/' ~ picture.imageName) }}" class="picture" alt="Gallery Picture">
+                                        <a href="{{ asset('uploads/pictures/' ~ picture.imageName) }}">
+                                            <img src="{{ asset('uploads/pictures/' ~ picture.imageName) }}" class="picture" alt="Gallery Picture">
+                                        </a>
                                     </div>
                                 </div>
                             {% endfor %}
                         </div>
-                        <div class="intersection-watcher"></div>
+                        {% if gallery.pictures|length >= 12%}
+                            <div class="intersection-watcher"></div>
+                        {% endif %}
                     </div>
+
                     <button type="button" class="btn btn-main" id="top">
                         <i class="fa-solid fa-arrow-up"></i>
                     </button>

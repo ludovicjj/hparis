@@ -22,10 +22,13 @@ main.container {
 .gallery-card {
     aspect-ratio: 1 / 1;
     overflow: hidden;
-    & .picture {
+    & a {
         height: 100%;
-        width: 100%;
-        object-fit: cover;
+        & .picture {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+        }
     }
 }
 

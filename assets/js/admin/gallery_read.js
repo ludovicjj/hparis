@@ -1,7 +1,6 @@
 import '../../styles/admin/gallery_read.scss';
 import {InfinitePictureScroll} from "../components/InfinitePictureScroll";
 
-
 const top = document.getElementById('top');
 
 if (top) {

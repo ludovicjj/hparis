@@ -1,0 +1,77 @@
+.lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,.9);
+    z-index: 100;
+    overflow: auto;
+    animation: lightboxIn .5s;
+    transition: opacity .3s;
+}
+.lightbox.fadeOut {
+    opacity: 0;
+}
+.lightbox_next, .lightbox_prev {
+    color: #fff;
+    width: 120px;
+    height: 192px;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0;
+
+    z-index: 101;
+}
+.lightbox_prev {
+    right: auto;
+    left: 0;
+    transform: rotate(180deg) translateY(50%);
+}
+
+.lightbox button {
+    border: none;
+    opacity: .5;
+    transition: opacity .3s;
+    background-color: transparent;
+    font-size: 1.5rem;
+}
+
+.lightbox .lightbox_close {
+    opacity: .7;
+    color: #fff;
+    width: 3rem;
+    height: 3rem;
+
+    position: fixed;
+    top: 20px;
+    left: 20px;
+}
+.lightbox_container {
+    margin-left: 150px;
+    margin-right: 150px;
+    padding-top: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    & img {
+        max-width: 100%;
+        height: auto;
+        animation: lightboxIn .5s;
+    }
+}
+.lightbox_loader {
+    width: 38px;
+    height: 38px;
+    background: url('../../images/loader.svg') center center no-repeat;
+}
+.lightbox button:hover {
+    opacity: 1;
+}
+
+@keyframes lightboxIn {
+    from {opacity:0;}
+    to {opacity:1;}
+}
