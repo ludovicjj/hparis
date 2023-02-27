@@ -175,6 +175,12 @@ class AdminGalleryController extends AbstractController
         return $this->sendInvalidHeader();
     }
 
+    #[Route('/api/galleries/{id}', name: 'api_gallery_delete', methods: ['DELETE'])]
+    public function delete(int $id)
+    {
+
+    }
+
     private function sendInvalidHeader(): Response
     {
         $data = ['message' => "Bad request: Invalid Headers", 'code' => Response::HTTP_BAD_REQUEST];
