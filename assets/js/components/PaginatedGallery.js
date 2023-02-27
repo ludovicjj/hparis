@@ -1,5 +1,6 @@
 import { getPaginationLinks, getPaginationHTML, sendRequest } from "./PaginationHelper";
 import { Tooltip } from 'bootstrap';
+import Swal from "sweetalert2";
 
 class PaginatedGallery
 {
@@ -15,6 +16,10 @@ class PaginatedGallery
         this.filterContainer = filterContainer
         this.category = null;
 
+        this.galleryContainer.querySelectorAll('.gallery-delete').forEach(deleteBtn => {
+            deleteBtn.addEventListener('click', this.handleDelete.bind(this))
+        })
+
         this.itemPerPage = parseInt(this.galleryContainer.dataset.perPage)
         this.url = this.galleryContainer.dataset.url;
 
@@ -23,6 +28,52 @@ class PaginatedGallery
         })
 
         this.buildPagination()
+    }
+
+    handleDelete(e) {
+        e.preventDefault();
+        const deleteLink = e.currentTarget;
+        const url = deleteLink.href
+        const page = this.galleryContainer.dataset.page
+        const count = this.galleryContainer.childElementCount;
+
+        Swal.fire({
+            icon: 'question',
+            title: 'Supprimer ?',
+            text: 'Êtes-vous sûr de supprimez cette galerie ?',
+            showCancelButton: true,
+            confirmButtonColor: '#4869ee',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Oui',
+            cancelButtonText: 'Non'
+        }).then(result => {
+            if (result.isConfirmed) {
+                const body = JSON.stringify({page, count, category: this.category});
+                const headers = { "Accept": "application/json", "Content-Type": "application/json"}
+
+                sendRequest(url, 'DELETE', {headers, body}).then(({gallery, total}) => {
+                    if (total === null) {
+                        total = 0
+                    }
+                    // remove tooltip
+                    Tooltip.getInstance(deleteLink).dispose()
+                    // remove gallery
+                    deleteLink.closest('.gallery-card').parentElement.remove()
+                    // display gallery on next page
+                    if (gallery.length > 0) {
+                        this.createGallery(gallery)
+                    }
+                    // update total
+                    this.galleryContainer.dataset.total = (total).toString()
+                    this.buildPagination();
+                }).finally(_ => {
+                    if (this.galleryContainer.dataset.total < 1) {
+                        const alert = this.createAlert("Il n'y a aucune galerie associée à cette catégorie.")
+                        this.galleryContainer.appendChild(alert);
+                    }
+                })
+            }
+        })
     }
 
     buildPagination () {
@@ -84,31 +135,18 @@ class PaginatedGallery
     loadGallery(page, category = null) {
         let url = this.url + `?page=${page}` + (category ? `&c=${encodeURIComponent(category)}` : '')
         const options = {headers: { "Accept": "application/json"} }
-        const fragment = document.getElementById('gallery-card-template').content
 
         sendRequest(url, 'GET', options).then(({galleries, total}) => {
+            if (total === null) {
+                total = 0
+            }
             this.galleryContainer.replaceChildren();
             if (galleries.length === 0) {
                 const alert = this.createAlert("Il n'y a aucune galerie associée à cette catégorie.")
                 this.galleryContainer.appendChild(alert);
 
             }
-            galleries.forEach(gallery => {
-                const cardTemplate = fragment.cloneNode(true)
-
-                // update link
-                cardTemplate.querySelectorAll('a').forEach(link => {
-                    link.setAttribute(
-                        'href',
-                        link.getAttribute('href').replace("@id", gallery.id)
-                    )
-                })
-
-                // update thumbnail
-                cardTemplate.querySelector('.gallery-thumbnail').setAttribute('src', `/uploads/thumbnails/${gallery.thumbnail.imageName}`)
-
-                this.galleryContainer.appendChild(cardTemplate);
-            })
+            this.createGallery(galleries)
 
             this.galleryContainer.dataset.total = (total).toString()
             this.buildPagination()
@@ -117,10 +155,6 @@ class PaginatedGallery
         }).finally(_ => {
             this.galleryContainer.removeAttribute('style')
             this.galleryContainer.classList.remove('loading')
-
-            this.galleryContainer.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(tooltipTriggerEl => {
-                new Tooltip(tooltipTriggerEl)
-            })
         })
     }
 
@@ -136,6 +170,39 @@ class PaginatedGallery
         alert.innerText = message;
 
         return alert
+    }
+
+    /**
+     * @param {Object[]} galleries
+     */
+    createGallery(galleries) {
+        const fragment = document.getElementById('gallery-card-template').content
+        galleries.forEach(gallery => {
+            const cardTemplate = fragment.cloneNode(true)
+
+            // update links
+            cardTemplate.querySelectorAll('a').forEach(link => {
+                link.setAttribute(
+                    'href',
+                    link.getAttribute('href').replace("@id", gallery.id)
+                )
+            })
+
+            // update thumbnail
+            cardTemplate.querySelector('.gallery-thumbnail').setAttribute('src', `/uploads/thumbnails/${gallery.thumbnail.imageName}`)
+
+            // add delete event
+            cardTemplate.querySelectorAll('.gallery-delete').forEach(link => {
+                link.addEventListener('click', this.handleDelete.bind(this))
+            })
+
+            // tooltips
+            cardTemplate.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(tooltipTriggerEl => {
+                new Tooltip(tooltipTriggerEl, {trigger: 'hover'})
+            })
+
+            this.galleryContainer.appendChild(cardTemplate);
+        })
     }
 }
 

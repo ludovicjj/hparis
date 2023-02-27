@@ -176,9 +176,42 @@ class AdminGalleryController extends AbstractController
     }
 
     #[Route('/api/galleries/{id}', name: 'api_gallery_delete', methods: ['DELETE'])]
-    public function delete(int $id)
+    public function delete(
+        int $id,
+        GalleryRepository $galleryRepository,
+        Request $request,
+        SerializerInterface $serializer
+    ): Response
     {
+        if ($request->isXmlHttpRequest()) {
+            $galleryToDelete = $galleryRepository->find($id);
 
+            if (!$galleryToDelete) {
+                throw new NotFoundHttpException('Gallery not found');
+            }
+
+            $page = $request->request->getInt('page', 1);
+            $count = $request->request->getInt('count');
+            $category = $request->request->get('category');
+
+            $nextGalleryPaginated = $galleryRepository->findGalleryOnNextPage($page, $category);
+            $nextGallery = iterator_to_array($nextGalleryPaginated);
+            $galleryRepository->remove($galleryToDelete, true);
+
+            if ($count !== GalleryRepository::ADMIN_ITEMS_PER_PAGE || empty($nextGallery)) {
+                $data = $serializer->serialize(["gallery" => [], "total" => $nextGalleryPaginated->count()], 'json');
+            } else {
+                $data = $serializer->serialize(
+                    ["gallery" => $nextGallery, "total" => $nextGalleryPaginated->count()],
+                    'json',
+                    [AbstractNormalizer::IGNORED_ATTRIBUTES => ['pictures', 'categories']]
+                );
+            }
+
+            return new JsonResponse($data, Response::HTTP_OK, [], true);
+        }
+
+        return $this->sendInvalidHeader();
     }
 
     private function sendInvalidHeader(): Response

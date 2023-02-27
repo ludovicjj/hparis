@@ -93,6 +93,23 @@ class GalleryRepository extends ServiceEntityRepository
         return new Paginator($qb->getQuery());
     }
 
+    public function findGalleryOnNextPage(int $page, ?string $category = null): Paginator
+    {
+        $offset = $page * self::ADMIN_ITEMS_PER_PAGE;
+        $queryBuilder = $this->getGalleryWithLimit($page);
+        $queryBuilder
+            ->setFirstResult($offset)
+            ->setMaxResults(1);
+
+        if ($category) {
+            $queryBuilder->innerJoin('g.categories', 'c')
+                ->andWhere('c.name LIKE :category')
+                ->setParameter('category', "%{$category}%");
+        }
+
+        return new Paginator($queryBuilder->getQuery());
+    }
+
     private function getGalleryWithLimit($page): QueryBuilder
     {
         $offset = ($page - 1) * self::ADMIN_ITEMS_PER_PAGE;
