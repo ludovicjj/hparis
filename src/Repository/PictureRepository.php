@@ -59,22 +59,10 @@ class PictureRepository extends ServiceEntityRepository
         return new Paginator($query);
     }
 
-    public function searchPictureByPageAndGallery(int $galleryId, int $page)
+    public function searchPictureByPageAndGallery(int $galleryId, int $page, int $count)
     {
-        $query = $this->searchPicturesByGalleryAndLimit($galleryId, $page);
+        $query = $this->searchPicturesByGalleryAndLimit($galleryId, $page, $count);
         return $query->getResult();
-    }
-
-    private function searchPicturesByGalleryAndLimit(int $galleryId, int $page): Query
-    {
-        $offset = ($page - 1 ) * self::ITEMS_PER_PAGE;
-
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.gallery = :id')
-            ->setParameter('id', $galleryId)
-            ->setFirstResult($offset)
-            ->setMaxResults(self::ITEMS_PER_PAGE)
-            ->getQuery();
     }
 
     public function findFistImageOnNextPage(int $galleryId, int $page)
@@ -85,6 +73,22 @@ class PictureRepository extends ServiceEntityRepository
             ->setFirstResult($offset)
             ->setMaxResults(1)
             ->getResult();
+    }
+
+    private function searchPicturesByGalleryAndLimit(
+        int $galleryId,
+        int $page,
+        int $perPage = self::ITEMS_PER_PAGE
+    ): Query
+    {
+        $offset = ($page - 1 ) * $perPage;
+
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.gallery = :id')
+            ->setParameter('id', $galleryId)
+            ->setFirstResult($offset)
+            ->setMaxResults($perPage)
+            ->getQuery();
     }
 
 //    /**

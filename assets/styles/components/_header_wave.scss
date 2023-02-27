@@ -2,19 +2,63 @@
     & .wave-header_background {
         background-color: var(--main-color);
     }
-    & .container {
-        display: flex;
-    }
     color: #fff;
 }
+
+.wave-header_wrapper {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+.wave-header_content {
+    flex-grow: 1;
+    .state {
+        text-decoration: underline;
+        font-weight: 600;
+    }
+}
+
 // fix spacing for action btn
 .wave-header .container {
     padding-bottom: .5rem;
 }
 
 // action
+.wave-header .wave-header_action {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    & a {
+        width: fit-content;
+    }
+}
 .wave-header .wave-header_action a:hover {
     color: var(--main-color);
+}
+
+// badge
+.badge {
+    color: var(--main-color);
+}
+
+// thumbnail
+.wave-header_thumbnail {
+    position: relative;
+    max-height: 2px;
+    width: 200px;
+    & img {
+        position: absolute;
+        top:0;
+        right: 0;
+        z-index: 2;
+
+        display: block;
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        box-shadow: 0 0 25px var(--box-shadow-medium-rgba);
+        border-radius: .5rem;
+    }
 }
 
 // Breadcrumb
@@ -36,12 +80,12 @@
 }
 
 // Title and info
-.wave-header_body .wave-header_title {
+.wave-header_content .wave-header_title {
     font-size: 42px;
     font-weight: 700;
     font-style: normal;
 }
-.wave-header_body > p {
+.wave-header_body_content > p {
     font-size: 1rem;
 }
 
@@ -63,17 +107,45 @@
     .wave-header .wave {
         height: 85px;
     }
+    .wave-header .wave-header_action {
+        flex-direction: row;
+    }
 }
 @media (min-width: 768px) {
     .wave-header .wave {
         height: 100px;
     }
+    .wave-header_thumbnail {
+        min-width: 250px;
+        img {
+            width: 250px;
+            height: 250px;
+        }
+    }
 }
 @media (min-width: 992px) {
+    .wave-header_thumbnail {
+        min-width: 285px;
+        img {
+            width: 285px;
+            height: 285px;
+        }
+    }
+
     .wave-header .wave {
         height: 140px;
     }
-    .wave-header_body > p {
+    .wave-header_content > p {
         font-size: 1.2rem;
+    }
+}
+@media (min-width: 1200px) {
+    .wave-header_thumbnail {
+        // 310
+        min-width: 340px;
+        img {
+            width: 340px;
+            height: 340px;
+        }
     }
 }

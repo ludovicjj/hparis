@@ -1,18 +1,24 @@
 <header class="wave-header">
     <div class="wave-header_background">
-        <div class="container">
-            <div>
-                <div class="breadcrumb">
-                    {% for breadcrumb in breadcrumbs %}
-                        <a href="{{ breadcrumb.path }}" class="breadcrumb-link">{{ breadcrumb.label }}</a>
-                        {{ loop.last ? '' : '<i class="fa-solid fa-chevron-right"></i>'}}
-                    {% endfor %}
-                </div>
-                <div class="wave-header_body">
+        <div class="container flex-column">
+            <div class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                    <a href="{{ breadcrumb.path }}" class="breadcrumb-link">{{ breadcrumb.label }}</a>
+                    {{ loop.last ? '' : '<i class="fa-solid fa-chevron-right"></i>'}}
+                {% endfor %}
+            </div>
+
+            <div class="wave-header_wrapper">
+                <div class="wave-header_content">
                     <h1 class="wave-header_title">{{ title }}</h1>
-                    <p>
-                        {{ description }}
-                    </p>
+                    {% if categories_tag is defined %}
+                        <div class="wave-category mb-2">
+                            {% for category in categories_tag %}
+                                <span class="badge rounded-pill bg-light">{{ category.name }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <p>{{ description|raw }}</p>
                     {% if actions is defined %}
                         <div class="wave-header_action">
                             {% for action in actions %}
@@ -21,7 +27,13 @@
                         </div>
                     {% endif %}
                 </div>
+                {% if thumbnail is defined %}
+                    <div class="wave-header_thumbnail d-none d-md-block ms-4">
+                        <img src="{{ thumbnail.path }}" alt="thumbnail">
+                    </div>
+                {% endif %}
             </div>
+
         </div>
     </div>
     <div class="wave">

@@ -45,7 +45,7 @@
                         {% for gallery in galleries %}
                             <div class="col-6 col-sm-4 col-md-3 mb-4">
                                 <div class="card gallery-card">
-                                    <a href="#" class="gallery-show h-100">
+                                    <a href="{{ path('admin_gallery_read', {id: gallery.id}) }}" class="gallery-show h-100">
                                         <img src="{{ asset('uploads/thumbnails/' ~ gallery.thumbnail.imageName) }}" class="gallery-thumbnail" alt="thumbnail">
                                     </a>
                                     <div class="card-action">
@@ -64,6 +64,7 @@
                                             data-bs-placement="left"
                                             data-bs-custom-class="custom-tooltip"
                                             data-bs-title="Supprimer la galerie."
+                                            class="gallery-delete"
                                         >
                                             <i class="fa-solid fa-xmark"></i>
                                         </a>

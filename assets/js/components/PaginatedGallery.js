@@ -95,10 +95,17 @@ class PaginatedGallery
             }
             galleries.forEach(gallery => {
                 const cardTemplate = fragment.cloneNode(true)
-                cardTemplate.querySelector('.gallery-thumbnail').setAttribute('src', `/uploads/thumbnails/${gallery.thumbnail.imageName}`)
 
-                const updatePath = cardTemplate.querySelector('.gallery-update').getAttribute('href');
-                cardTemplate.querySelector('.gallery-update').setAttribute('href', updatePath.replace("@id", gallery.id))
+                // update link
+                cardTemplate.querySelectorAll('a').forEach(link => {
+                    link.setAttribute(
+                        'href',
+                        link.getAttribute('href').replace("@id", gallery.id)
+                    )
+                })
+
+                // update thumbnail
+                cardTemplate.querySelector('.gallery-thumbnail').setAttribute('src', `/uploads/thumbnails/${gallery.thumbnail.imageName}`)
 
                 this.galleryContainer.appendChild(cardTemplate);
             })
