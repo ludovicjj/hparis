@@ -51,7 +51,7 @@ class PaginatedGallery
                 const body = JSON.stringify({page, count, category: this.category});
                 const headers = { "Accept": "application/json", "Content-Type": "application/json"}
 
-                sendRequest(url, 'DELETE', {headers, body}).then(({gallery, total}) => {
+                return sendRequest(url, 'DELETE', {headers, body}).then(({gallery, total}) => {
                     if (total === null) {
                         total = 0
                     }
@@ -66,12 +66,14 @@ class PaginatedGallery
                     // update total
                     this.galleryContainer.dataset.total = (total).toString()
                     this.buildPagination();
-                }).finally(_ => {
-                    if (this.galleryContainer.dataset.total < 1) {
-                        const alert = this.createAlert("Il n'y a aucune galerie associée à cette catégorie.")
-                        this.galleryContainer.appendChild(alert);
-                    }
                 })
+            }
+        }).catch(err => {
+            console.error(err)
+        }).finally(_ => {
+            if (this.galleryContainer.dataset.total < 1) {
+                const alert = this.createAlert("Il n'y a aucune galerie associée à cette catégorie.")
+                this.galleryContainer.appendChild(alert);
             }
         })
     }
