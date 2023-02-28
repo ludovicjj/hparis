@@ -194,15 +194,17 @@ class AdminGalleryController extends AbstractController
             $count = $request->request->getInt('count');
             $category = $request->request->get('category');
 
-            $nextGalleryPaginated = $galleryRepository->findGalleryOnNextPage($page, $category);
-            $nextGallery = iterator_to_array($nextGalleryPaginated);
+            $paginator = $galleryRepository->findGalleryOnNextPage($page, $category);
+            $nextGallery = iterator_to_array($paginator);
             $galleryRepository->remove($galleryToDelete, true);
 
+            $total = $paginator->count();
+
             if ($count !== GalleryRepository::ADMIN_ITEMS_PER_PAGE || empty($nextGallery)) {
-                $data = $serializer->serialize(["gallery" => [], "total" => $nextGalleryPaginated->count()], 'json');
+                $data = $serializer->serialize(["gallery" => [], "total" => $total], 'json');
             } else {
                 $data = $serializer->serialize(
-                    ["gallery" => $nextGallery, "total" => $nextGalleryPaginated->count()],
+                    ["gallery" => $nextGallery, "total" => $total],
                     'json',
                     [AbstractNormalizer::IGNORED_ATTRIBUTES => ['pictures', 'categories']]
                 );
