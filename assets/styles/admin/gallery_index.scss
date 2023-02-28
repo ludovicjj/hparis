@@ -5,6 +5,18 @@
 main.container {
     flex-grow: 1;
 }
+.gallery {
+    position: relative;
+}
+.gallery.loading::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,.5) url('../../images/loader.svg') center / contain no-repeat;
+    background-size: 4rem;
+    z-index: 1;
+}
+
 .gallery-card {
     aspect-ratio: 1 / 1;
     overflow: hidden;
@@ -13,6 +25,9 @@ main.container {
         height: 100%;
         width: 100%;
         object-fit: cover;
+    }
+    &.remove {
+        opacity: .5;
     }
 }
 .card-action {

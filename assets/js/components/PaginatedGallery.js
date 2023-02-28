@@ -5,7 +5,6 @@ import Swal from "sweetalert2";
 class PaginatedGallery
 {
     /**
-     *
      * @param {HTMLElement} galleryContainer
      * @param {HTMLElement} paginationContainer
      * @param {HTMLElement} filterContainer
@@ -14,14 +13,15 @@ class PaginatedGallery
         this.galleryContainer = galleryContainer
         this.paginationContainer = paginationContainer
         this.filterContainer = filterContainer
+
+        this.currentPage = parseInt(galleryContainer.dataset.page)
         this.category = null;
+        this.itemPerPage = parseInt(this.galleryContainer.dataset.perPage)
+        this.url = this.galleryContainer.dataset.url;
 
         this.galleryContainer.querySelectorAll('.gallery-delete').forEach(deleteBtn => {
             deleteBtn.addEventListener('click', this.handleDelete.bind(this))
         })
-
-        this.itemPerPage = parseInt(this.galleryContainer.dataset.perPage)
-        this.url = this.galleryContainer.dataset.url;
 
         this.filterContainer.querySelectorAll('a.category').forEach(category => {
             category.addEventListener('click', this.handleFilter.bind(this))
@@ -34,8 +34,10 @@ class PaginatedGallery
         e.preventDefault();
         const deleteLink = e.currentTarget;
         const url = deleteLink.href
-        const page = this.galleryContainer.dataset.page
         const count = this.galleryContainer.childElementCount;
+        let refresh = false
+        const tooltip = Tooltip.getInstance(deleteLink)
+        tooltip.disable()
 
         Swal.fire({
             icon: 'question',
@@ -48,25 +50,45 @@ class PaginatedGallery
             cancelButtonText: 'Non'
         }).then(result => {
             if (result.isConfirmed) {
-                const body = JSON.stringify({page, count, category: this.category});
+                const body = JSON.stringify({page: this.currentPage, count, category: this.category});
                 const headers = { "Accept": "application/json", "Content-Type": "application/json"}
+
+                deleteLink.closest('.gallery-card').classList.add('remove')
+
+                if (count === 1 && this.totalPage > 1) {
+                    refresh = true
+                    this.updateCurrentPage((this.currentPage - 1).toString())
+                    this.galleryContainer.style.height = `${this.galleryContainer.offsetHeight}px`
+                    this.galleryContainer.classList.add('loading')
+                }
 
                 return sendRequest(url, 'DELETE', {headers, body}).then(({gallery, total}) => {
                     if (total === null) {
                         total = 0
                     }
                     // remove tooltip
-                    Tooltip.getInstance(deleteLink).dispose()
+                    tooltip.dispose()
+
                     // remove gallery
                     deleteLink.closest('.gallery-card').parentElement.remove()
-                    // display gallery on next page
+
+                    //display gallery on next page
                     if (gallery.length > 0) {
                         this.createGallery(gallery)
                     }
+
                     // update total
                     this.galleryContainer.dataset.total = (total).toString()
+
+                    //refresh
+                    if (refresh) {
+                        this.loadGallery(this.currentPage, this.category)
+                    }
+
                     this.buildPagination();
                 })
+            } else {
+                tooltip.enable()
             }
         }).catch(err => {
             console.error(err)
@@ -79,14 +101,13 @@ class PaginatedGallery
     }
 
     buildPagination () {
-        const currentPage = parseInt(this.galleryContainer.dataset.page);
         this.totalItems = parseInt(this.galleryContainer.dataset.total)
         this.totalPage = Math.ceil(this.totalItems / this.itemPerPage);
-        let paginationLinks = getPaginationLinks(currentPage, this.totalPage);
+        let paginationLinks = getPaginationLinks(this.currentPage, this.totalPage);
         this.paginationContainer.replaceChildren();
 
         const links = paginationLinks.map(link => {
-            return getPaginationHTML(link, currentPage)
+            return getPaginationHTML(link, this.currentPage)
         })
 
         links.forEach(link => {
@@ -103,12 +124,13 @@ class PaginatedGallery
     handleFilter(e) {
         e.preventDefault()
         this.filterContainer.querySelector('a.category.active')?.classList.remove('active')
-        this.galleryContainer.dataset.page = '1'
+        this.updateCurrentPage('1')
 
         e.currentTarget.classList.add('active');
         this.category = e.currentTarget.dataset.category
+        this.galleryContainer.classList.add('loading')
 
-        this.loadGallery('1', this.category)
+        this.loadGallery(this.currentPage, this.category)
     }
 
     /**
@@ -123,15 +145,15 @@ class PaginatedGallery
             console.error('Page not Found');
             return
         }
+        this.updateCurrentPage(page)
 
-        this.galleryContainer.dataset.page = page
         this.galleryContainer.classList.add('loading')
         this.buildPagination()
-        this.loadGallery(page, this.category)
+        this.loadGallery(this.currentPage, this.category)
     }
 
     /**
-     * @param {string} page
+     * @param {number} page
      * @param {string|null} category
      */
     loadGallery(page, category = null) {
@@ -191,7 +213,8 @@ class PaginatedGallery
             })
 
             // update thumbnail
-            cardTemplate.querySelector('.gallery-thumbnail').setAttribute('src', `/uploads/thumbnails/${gallery.thumbnail.imageName}`)
+            const {thumbnail: {imageName}} = gallery
+            cardTemplate.querySelector('.gallery-thumbnail').setAttribute('src', `/uploads/thumbnails/${imageName}`)
 
             // add delete event
             cardTemplate.querySelectorAll('.gallery-delete').forEach(link => {
@@ -205,6 +228,18 @@ class PaginatedGallery
 
             this.galleryContainer.appendChild(cardTemplate);
         })
+    }
+
+    /**
+     * @param {string} page
+     */
+    updateCurrentPage(page) {
+        if (isNaN(parseInt(page)) || page > this.totalPage) {
+            console.error('page not found.')
+            return;
+        }
+        this.galleryContainer.dataset.page = page
+        this.currentPage = parseInt(page)
     }
 }
 
