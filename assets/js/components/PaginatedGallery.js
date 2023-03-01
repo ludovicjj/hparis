@@ -79,7 +79,6 @@ class PaginatedGallery
         e.currentTarget.classList.add('active');
 
         this.updateCurrentPage('1')
-        console.log(this.currentPage);
 
         this.category = e.currentTarget.dataset.category
         this.loadGallery(this.currentPage, this.category)
@@ -132,7 +131,6 @@ class PaginatedGallery
 
                     //refresh
                     if (refresh) {
-                        console.log('page is empty, load data from previous page')
                         this.loadGallery(this.currentPage, this.category)
                     }
 
