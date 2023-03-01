@@ -15,22 +15,77 @@ class PaginatedGallery
         this.filterContainer = filterContainer
 
         this.currentPage = parseInt(galleryContainer.dataset.page)
-        this.category = null;
         this.itemPerPage = parseInt(this.galleryContainer.dataset.perPage)
+        this.totalItems = parseInt(this.galleryContainer.dataset.total)
+        this.category = null;
         this.url = this.galleryContainer.dataset.url;
 
+        // delete
         this.galleryContainer.querySelectorAll('.gallery-delete').forEach(deleteBtn => {
             deleteBtn.addEventListener('click', this.handleDelete.bind(this))
         })
 
+        // filter gallery
         this.filterContainer.querySelectorAll('a.category').forEach(category => {
-            category.addEventListener('click', this.handleFilter.bind(this))
+            category.addEventListener('click', this.handleCategoryChange.bind(this))
         })
 
         this.buildPagination()
     }
 
-    handleDelete(e) {
+    /**
+     * Make HTML Links for pagination
+     * Needed variables :
+     * - totalItems(dynamique)
+     * - ItemsPerPage(fixe)
+     * - currentPage(dynamique)
+     */
+    buildPagination () {
+        this.paginationContainer.replaceChildren();
+        this.totalPage = Math.ceil(this.totalItems / this.itemPerPage);
+        let paginationLinks = getPaginationLinks(this.currentPage, this.totalPage);
+
+        const links = paginationLinks.map(link => {
+            return getPaginationHTML(link, this.currentPage)
+        })
+
+
+        links.forEach(link => {
+            if (!link.classList.contains('disabled')) {
+                link.addEventListener('click', this.handlePageChange.bind(this))
+            }
+            this.paginationContainer.appendChild(link)
+        })
+    }
+
+    /**
+     * Handle change page
+     * @param {PointerEvent} e
+     */
+    handlePageChange (e) {
+        e.preventDefault();
+        const page = e.currentTarget.dataset.page
+        this.updateCurrentPage(page)
+
+        this.loadGallery(this.currentPage, this.category)
+    }
+
+    /**
+     * @param {PointerEvent} e
+     */
+    handleCategoryChange (e) {
+        e.preventDefault()
+        this.filterContainer.querySelector('a.category.active')?.classList.remove('active')
+        e.currentTarget.classList.add('active');
+
+        this.updateCurrentPage('1')
+        console.log(this.currentPage);
+
+        this.category = e.currentTarget.dataset.category
+        this.loadGallery(this.currentPage, this.category)
+    }
+
+    handleDelete (e) {
         e.preventDefault();
         const deleteLink = e.currentTarget;
         const url = deleteLink.href
@@ -52,20 +107,18 @@ class PaginatedGallery
             if (result.isConfirmed) {
                 const body = JSON.stringify({page: this.currentPage, count, category: this.category});
                 const headers = { "Accept": "application/json", "Content-Type": "application/json"}
-
                 deleteLink.closest('.gallery-card').classList.add('remove')
 
                 if (count === 1 && this.totalPage > 1) {
                     refresh = true
                     this.updateCurrentPage((this.currentPage - 1).toString())
-                    this.galleryContainer.style.height = `${this.galleryContainer.offsetHeight}px`
-                    this.galleryContainer.classList.add('loading')
                 }
 
-                return sendRequest(url, 'DELETE', {headers, body}).then(({gallery, total}) => {
-                    if (total === null) {
-                        total = 0
-                    }
+                return sendRequest(url, 'DELETE', {headers, body}).then( async ({gallery, total}) => {
+                    // update total
+                    this.totalItems = total || 0
+                    this.galleryContainer.dataset.total = (total).toString()
+
                     // remove tooltip
                     tooltip.dispose()
 
@@ -74,14 +127,12 @@ class PaginatedGallery
 
                     //display gallery on next page
                     if (gallery.length > 0) {
-                        this.createGallery(gallery)
+                        await this.createGallery(gallery)
                     }
-
-                    // update total
-                    this.galleryContainer.dataset.total = (total).toString()
 
                     //refresh
                     if (refresh) {
+                        console.log('page is empty, load data from previous page')
                         this.loadGallery(this.currentPage, this.category)
                     }
 
@@ -93,92 +144,34 @@ class PaginatedGallery
         }).catch(err => {
             console.error(err)
         }).finally(_ => {
-            if (this.galleryContainer.dataset.total < 1) {
-                const alert = this.createAlert("Il n'y a aucune galerie associée à cette catégorie.")
-                this.galleryContainer.appendChild(alert);
-            }
+            this.displayAlertIfEmptyGalleries(this.totalItems)
         })
     }
 
-    buildPagination () {
-        this.totalItems = parseInt(this.galleryContainer.dataset.total)
-        this.totalPage = Math.ceil(this.totalItems / this.itemPerPage);
-        let paginationLinks = getPaginationLinks(this.currentPage, this.totalPage);
-        this.paginationContainer.replaceChildren();
-
-        const links = paginationLinks.map(link => {
-            return getPaginationHTML(link, this.currentPage)
-        })
-
-        links.forEach(link => {
-            if (!link.classList.contains('disabled')) {
-                link.addEventListener('click', this.changePage.bind(this))
-            }
-            this.paginationContainer.appendChild(link)
-        })
-    }
-
-    /**
-     * @param {PointerEvent} e
-     */
-    handleFilter(e) {
-        e.preventDefault()
-        this.filterContainer.querySelector('a.category.active')?.classList.remove('active')
-        this.updateCurrentPage('1')
-
-        e.currentTarget.classList.add('active');
-        this.category = e.currentTarget.dataset.category
-        this.galleryContainer.classList.add('loading')
-
-        this.loadGallery(this.currentPage, this.category)
-    }
-
-    /**
-     * Handle change page
-     * @param {PointerEvent} e
-     */
-    changePage(e) {
-        e.preventDefault();
-        const page = e.currentTarget.dataset.page
-
-        if (page > this.totalPage) {
-            console.error('Page not Found');
-            return
-        }
-        this.updateCurrentPage(page)
-
-        this.galleryContainer.classList.add('loading')
-        this.buildPagination()
-        this.loadGallery(this.currentPage, this.category)
-    }
 
     /**
      * @param {number} page
      * @param {string|null} category
      */
     loadGallery(page, category = null) {
-        let url = this.url + `?page=${page}` + (category ? `&c=${encodeURIComponent(category)}` : '')
+        const url = this.url + `?page=${page}` + (category ? `&c=${encodeURIComponent(category)}` : '')
         const options = {headers: { "Accept": "application/json"} }
 
-        sendRequest(url, 'GET', options).then(({galleries, total}) => {
-            if (total === null) {
-                total = 0
-            }
+        this.loadingStyle();
+
+        sendRequest(url, 'GET', options).then( async ({galleries, total}) => {
+            this.totalItems = total || 0
             this.galleryContainer.replaceChildren();
-            if (galleries.length === 0) {
-                const alert = this.createAlert("Il n'y a aucune galerie associée à cette catégorie.")
-                this.galleryContainer.appendChild(alert);
+            this.galleryContainer.dataset.total = (this.totalItems).toString()
 
-            }
-            this.createGallery(galleries)
+            this.displayAlertIfEmptyGalleries(galleries.length) // not sure here
 
-            this.galleryContainer.dataset.total = (total).toString()
             this.buildPagination()
+            await this.createGallery(galleries)
         }).catch(err => {
             console.error(err)
         }).finally(_ => {
-            this.galleryContainer.removeAttribute('style')
-            this.galleryContainer.classList.remove('loading')
+            this.loadingStyle();
         })
     }
 
@@ -198,10 +191,22 @@ class PaginatedGallery
 
     /**
      * @param {Object[]} galleries
+     * @return {Promise<string>}
      */
-    createGallery(galleries) {
-        const fragment = document.getElementById('gallery-card-template').content
-        galleries.forEach(gallery => {
+    async createGallery(galleries) {
+
+        return new Promise((resolve) => {
+            if (galleries.length === 0) {
+                resolve('empty galleries')
+            }
+            this.onLoadGallery(galleries, resolve)
+        })
+    }
+
+    onLoadGallery (galleries, resolve) {
+        for (let i = 0; i < galleries.length; i++) {
+            const fragment = document.getElementById('gallery-card-template').content
+            const gallery = galleries[i]
             const cardTemplate = fragment.cloneNode(true)
 
             // update links
@@ -211,10 +216,6 @@ class PaginatedGallery
                     link.getAttribute('href').replace("@id", gallery.id)
                 )
             })
-
-            // update thumbnail
-            const {thumbnail: {imageName}} = gallery
-            cardTemplate.querySelector('.gallery-thumbnail').setAttribute('src', `/uploads/thumbnails/${imageName}`)
 
             // add delete event
             cardTemplate.querySelectorAll('.gallery-delete').forEach(link => {
@@ -226,21 +227,61 @@ class PaginatedGallery
                 new Tooltip(tooltipTriggerEl, {trigger: 'hover'})
             })
 
+            // thumbnail
+            const {thumbnail: {imageName}} = gallery
+            const thumbnail = new Image()
+            thumbnail.classList.add('gallery-thumbnail')
+            thumbnail.src = `/uploads/thumbnails/${imageName}`
+
+            cardTemplate.querySelector('.gallery-thumbnail').replaceWith(thumbnail)
             this.galleryContainer.appendChild(cardTemplate);
-        })
+
+            if ((galleries.length - 1) === i) {
+                thumbnail.onload = () => {
+                    return resolve(`last image loaded, index: ${i} / ${galleries.length - 1} `)
+                }
+            }
+        }
     }
 
     /**
+     * Check given page
+     * Change property currentPage and update data attr page to gallery container
      * @param {string} page
      */
     updateCurrentPage(page) {
-        if (isNaN(parseInt(page)) || page > this.totalPage) {
-            console.error('page not found.')
+        if (isNaN(parseInt(page))) {
+            console.error('Invalid page.')
             return;
         }
         this.galleryContainer.dataset.page = page
         this.currentPage = parseInt(page)
     }
+
+    /**
+     * @param {number} count Gallery count
+     */
+    displayAlertIfEmptyGalleries (count) {
+        if (count === 0) {
+            const alert = this.createAlert("Il n'y a aucune galerie associée à cette catégorie.")
+            this.galleryContainer.appendChild(alert);
+        }
+    }
+
+    /**
+     * Toggle loading style to gallery container
+     */
+    loadingStyle() {
+        this.galleryContainer.classList.toggle('loading')
+
+        if (this.galleryContainer.classList.contains('loading')) {
+            this.galleryContainer.style.minHeight = "200px"
+            this.galleryContainer.style.alignContent = "flex-start"
+        } else {
+            this.galleryContainer.removeAttribute('style')
+        }
+    }
+
 }
 
 export default PaginatedGallery;
