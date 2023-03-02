@@ -16,13 +16,40 @@
     <div class="page-wrapper">
         {{ include ('partials/_wave_header.html.twig', {
             title : 'Vos catégories',
-            description : "Voici l'ensemble des catégories actuellement présentes sur le site. Vous pouvez pouvez ajouter, modifier ou supprimer un catégorie.",
-            breadcrumbs: [{'label': 'Admin','path': '#'},{'label': 'Catégorie','path': path('admin_category_index')}],
-            actions: [{'label': 'Ajouter une galerie','path': path('admin_gallery_create')}]
+            description : "Voici l'ensemble des catégories actuellement présentes sur le site. Vous pouvez ajouter une categorie en utilisant le formulaire ci-dessous ou bien modifier ou supprimer un catégorie en cliquant dessus.",
+            breadcrumbs: [{'label': 'Admin','path': '#'},{'label': 'Catégories','path': path('admin_category_index')}],
+            actions: [{'label': 'Ajouter une catégorie','path': path('admin_gallery_create')}]
         }) }}
 
         <main class="container pt-4">
+            <div class="category-form">
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate', }}) }}
+                <div class="mb-3 category">
+                    {{ form_label(form.name) }}
+                    <div class="wrapper-field">
+                        <div class="category-field">
+                            {{ form_widget(form.name) }}
+                            {{ form_help(form.name) }}
+                        </div>
+                        <button type="submit" class="btn btn-main">Sauvegarder</button>
+                    </div>
+                    {{ form_errors(form.name) }}
+                </div>
+                {{ form_end(form) }}
+            </div>
 
+            <div class="category-wrapper">
+                {% for category in categories %}
+                    <button type="button" class="btn btn-main position-relative" data-category="{{ category.id }}">
+                        {{ category.name }}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill border border-light">
+                            {{ category.gallery_count }}
+                            <span class="visually-hidden">unread messages</span>
+                        </span>
+                    </button>
+                {% endfor %}
+            </div>
         </main>
+        {{ include('partials/_footer_wave.html.twig') }}
     </div>
 {% endblock %}
