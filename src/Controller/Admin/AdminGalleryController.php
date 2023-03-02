@@ -175,6 +175,47 @@ class AdminGalleryController extends AbstractController
         return $this->sendInvalidHeader();
     }
 
+    #[Route('/api/galleries/{id}', name: 'api_gallery_delete', methods: ['DELETE'])]
+    public function delete(
+        int $id,
+        GalleryRepository $galleryRepository,
+        Request $request,
+        SerializerInterface $serializer
+    ): Response
+    {
+        if ($request->isXmlHttpRequest()) {
+            $galleryToDelete = $galleryRepository->find($id);
+
+            if (!$galleryToDelete) {
+                throw new NotFoundHttpException('Gallery not found');
+            }
+
+            $page = $request->request->getInt('page', 1);
+            $count = $request->request->getInt('count');
+            $category = $request->request->get('category');
+
+            $paginator = $galleryRepository->findGalleryOnNextPage($page, $category);
+            $nextGallery = iterator_to_array($paginator);
+            $galleryRepository->remove($galleryToDelete, true);
+
+            $total = $paginator->count();
+
+            if ($count !== GalleryRepository::ADMIN_ITEMS_PER_PAGE || empty($nextGallery)) {
+                $data = $serializer->serialize(["gallery" => [], "total" => $total], 'json');
+            } else {
+                $data = $serializer->serialize(
+                    ["gallery" => $nextGallery, "total" => $total],
+                    'json',
+                    [AbstractNormalizer::IGNORED_ATTRIBUTES => ['pictures', 'categories']]
+                );
+            }
+
+            return new JsonResponse($data, Response::HTTP_OK, [], true);
+        }
+
+        return $this->sendInvalidHeader();
+    }
+
     private function sendInvalidHeader(): Response
     {
         $data = ['message' => "Bad request: Invalid Headers", 'code' => Response::HTTP_BAD_REQUEST];
