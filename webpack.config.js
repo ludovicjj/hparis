@@ -29,6 +29,7 @@ Encore
     .addEntry('admin_gallery_index', './assets/js/admin/gallery_index.js')
     .addEntry('admin_gallery_update', './assets/js/admin/gallery_update.js')
     .addEntry('admin_gallery_read', './assets/js/admin/gallery_read.js')
+    .addEntry('admin_category_index', './assets/js/admin/category_index.js')
 
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
     //.enableStimulusBridge('./assets/controllers.json')

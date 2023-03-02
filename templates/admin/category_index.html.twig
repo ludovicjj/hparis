@@ -1,0 +1,28 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}{{ parent() }} - Catégories{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('admin_category_index') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('admin_category_index') }}
+{% endblock %}
+
+{% block body %}
+    <div class="page-wrapper">
+        {{ include ('partials/_wave_header.html.twig', {
+            title : 'Vos catégories',
+            description : "Voici l'ensemble des catégories actuellement présentes sur le site. Vous pouvez pouvez ajouter, modifier ou supprimer un catégorie.",
+            breadcrumbs: [{'label': 'Admin','path': '#'},{'label': 'Catégorie','path': path('admin_category_index')}],
+            actions: [{'label': 'Ajouter une galerie','path': path('admin_gallery_create')}]
+        }) }}
+
+        <main class="container pt-4">
+
+        </main>
+    </div>
+{% endblock %}

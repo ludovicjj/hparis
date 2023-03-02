@@ -15,6 +15,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[IsGranted("ROLE_ADMIN")]
 class AdminCategoryController extends AbstractController
 {
+    #[Route('/admin/categories', name: 'admin_category_index')]
+    public function index(): Response
+    {
+        return $this->render('admin/category_index.html.twig', []);
+    }
+
     #[Route('/api/categories', name: 'api_category_search', methods: ['POST'])]
     public function search(
         Request $request,

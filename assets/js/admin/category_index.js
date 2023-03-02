@@ -1,0 +1,1 @@
+import '../../styles/admin/category_index.scss';
