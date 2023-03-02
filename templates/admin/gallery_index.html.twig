@@ -16,7 +16,7 @@
     <div class="page-wrapper">
         {{ include ('partials/_wave_header.html.twig', {
             title : 'Vos galeries',
-            description : "Voici l'ensemble des galeries actuellement présentes sur le site. Vous pouvez filtrer les galeries par categories qui se trouvent ci-dessous.",
+            description : "Voici l'ensemble des galeries actuellement présentes sur le site. Vous pouvez filtrer les galeries par les categories qui se trouvent ci-dessous.",
             breadcrumbs: [{'label': 'Admin','path': '#'},{'label': 'Galerie','path': path('admin_gallery')}],
             actions: [{'label': 'Ajouter une galerie','path': path('admin_gallery_create')}]
         }) }}
@@ -25,7 +25,7 @@
             <div class="row">
                 <section class="section-category">
                     <ul class="categories">
-                        <li><a href="#" class="btn btn-main category active">Tous</a></li>
+                        <li><a href="#" class="btn btn-main category active">Toutes</a></li>
                         {% for category in categories %}
                             <li>
                                 <a href="#" class="btn btn-main category" data-category="{{ category.name }}">
