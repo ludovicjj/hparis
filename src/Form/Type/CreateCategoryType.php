@@ -19,11 +19,18 @@ class CreateCategoryType extends AbstractType
         ]);
     }
 
+    // Change form attr name
+    public function getBlockPrefix(): string
+    {
+        return '';
+    }
+
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class' => Category::class,
-            'translation_domain' => 'form'
+            'translation_domain' => 'form',
+            'csrf_protection' => false,
         ]);
     }
 }

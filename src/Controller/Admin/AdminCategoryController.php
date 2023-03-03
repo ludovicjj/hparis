@@ -2,6 +2,8 @@
 
 namespace App\Controller\Admin;
 
+use App\Builder\ErrorsValidationBuilder;
+use App\Entity\Category;
 use App\Form\Type\CreateCategoryType;
 use App\Repository\CategoryRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,6 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[IsGranted("ROLE_ADMIN")]
 class AdminCategoryController extends AbstractController
@@ -28,7 +31,24 @@ class AdminCategoryController extends AbstractController
         ]);
     }
 
-    #[Route('/api/categories', name: 'api_category_search', methods: ['POST'])]
+    #[Route('/api/categories', name: 'api_category_create', methods: ['POST'])]
+    public function create(Request $request, ValidatorInterface $validator): Response
+    {
+        $input = explode(' ', trim($request->request->get('name')));
+        $categoryName = implode(' ', array_filter($input, fn($item) => $item !== ''));
+
+
+        $category = (new Category())->setName($categoryName);
+        $constraintsViolationList = $validator->validate($category);
+        ErrorsValidationBuilder::buildErrors($constraintsViolationList);
+
+        return new JsonResponse([
+            "id" => $category->getId(),
+            "name" => ucwords($category->getName())
+        ]);
+    }
+
+    #[Route('/api/categories', name: 'api_category_search', methods: ['GET'])]
     public function search(
         Request $request,
         CategoryRepository $categoryRepository,

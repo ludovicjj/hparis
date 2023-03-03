@@ -23,7 +23,7 @@
 
         <main class="container pt-4">
             <div class="category-form">
-                {{ form_start(form, {'attr': {'novalidate': 'novalidate', }}) }}
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'category-form', 'data-url': path('api_category_create') }}) }}
                 <div class="mb-3 category">
                     {{ form_label(form.name) }}
                     <div class="wrapper-field">
@@ -49,6 +49,7 @@
                     </button>
                 {% endfor %}
             </div>
+            {{ include('partials/_category_badge_template.html.twig') }}
         </main>
         {{ include('partials/_footer_wave.html.twig') }}
     </div>
