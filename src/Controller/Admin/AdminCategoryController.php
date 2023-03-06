@@ -6,10 +6,12 @@ use App\Builder\ErrorsValidationBuilder;
 use App\Entity\Category;
 use App\Form\Type\CreateCategoryType;
 use App\Repository\CategoryRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -32,20 +34,40 @@ class AdminCategoryController extends AbstractController
     }
 
     #[Route('/api/categories', name: 'api_category_create', methods: ['POST'])]
-    public function create(Request $request, ValidatorInterface $validator): Response
+    public function create(
+        Request $request,
+        ValidatorInterface $validator,
+        EntityManagerInterface $entityManager
+    ): Response
     {
         $input = explode(' ', trim($request->request->get('name')));
         $categoryName = implode(' ', array_filter($input, fn($item) => $item !== ''));
 
 
-        $category = (new Category())->setName($categoryName);
+        $category = (new Category())->setName(ucwords($categoryName));
         $constraintsViolationList = $validator->validate($category);
         ErrorsValidationBuilder::buildErrors($constraintsViolationList);
 
+        $entityManager->persist($category);
+        $entityManager->flush();
+
         return new JsonResponse([
             "id" => $category->getId(),
-            "name" => ucwords($category->getName())
+            "name" => $category->getName()
         ]);
+    }
+
+    #[Route('/api/categories/{id}', name: 'api_category_delete', methods: ['DELETE'])]
+    public function delete(int $id, CategoryRepository $categoryRepository): Response
+    {
+        $category = $categoryRepository->find($id);
+
+        if (!$category) {
+            throw new NotFoundHttpException('Category not found');
+        }
+        $categoryRepository->remove($category, true);
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
     #[Route('/api/categories', name: 'api_category_search', methods: ['GET'])]

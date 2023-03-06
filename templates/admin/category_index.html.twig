@@ -40,7 +40,12 @@
 
             <div class="category-wrapper">
                 {% for category in categories %}
-                    <button type="button" class="btn btn-main position-relative" data-category="{{ category.id }}">
+                    <button
+                        type="button"
+                        class="btn btn-main position-relative btn-category"
+                        data-name="{{ category.name }}"
+                        data-url="{{ path('api_category_delete', {id: category.id}) }}"
+                    >
                         {{ category.name }}
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill border border-light">
                             {{ category.gallery_count }}
