@@ -8,6 +8,15 @@ const categoryHelper = document.getElementById('name_help')
 const categoryTemplate = document.getElementById('category-template')
 const categoryContainer = document.querySelector('.category-wrapper');
 
+function updateCategory(data) {
+    const category = categoryContainer.querySelector(`[data-id="${data.id}"]`)
+    category.dataset.name = data.name
+    const badge = category.querySelector('.badge')
+    category.firstChild.remove()
+
+    const text = document.createTextNode(data.name)
+    badge.parentNode.insertBefore(text, badge)
+}
 
 async function categoryAction(e) {
     e.preventDefault()
@@ -51,7 +60,51 @@ async function categoryAction(e) {
             await Swal.fire(options)
         }
     } else if (resultAlert.isConfirmed) {
-        console.log("update")
+        Swal.fire({
+            input: 'text',
+            inputLabel: 'Nom de la Catégorie',
+            inputValue: `${name}`,
+            inputAttributes: {
+                autocapitalize: 'off',
+            },
+            showCancelButton: true,
+            cancelButtonText: 'Annuler',
+            confirmButtonText: 'Sauvegarder',
+            confirmButtonColor: '#4869ee',
+            showLoaderOnConfirm: true,
+            preConfirm: (updatedName) => {
+                const body = JSON.stringify({'name': updatedName})
+                const headers = {'Accept': 'application/json', "Content-Type": "application/json"}
+
+                return sendRequest(url, 'POST', {headers, body})
+                    .then(data => {
+                        return data
+                    }).catch(err => {
+                        if (err.code === 422) {
+                            const errorMessages = err.errors.reduce((acc, error) => {
+                                acc.push(error.message)
+                                return acc
+                            }, [])
+                            Swal.showValidationMessage(`Erreurs: ${errorMessages.join('<br>')}`)
+                        } else {
+                            Swal.showValidationMessage(`Request failed: ${err.message}`)
+                        }
+                    })
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                updateCategory(result.value)
+                const options = {
+                    icon: 'success',
+                    title: 'Bravo',
+                    text: 'La catégorie a été modifiée avec succès.',
+                    confirmButtonColor: '#4869ee',
+                    confirmButtonText: 'Cool'
+                }
+                Swal.fire(options)
+            }
+        })
     }
 }
 
@@ -105,6 +158,7 @@ function createCategory(data) {
     const categoryBtn = template.querySelector('.btn-category')
     categoryBtn.dataset.name = data.name
     categoryBtn.dataset.url = categoryBtn.dataset.url.replace('@id', data.id);
+    categoryBtn.dataset.id = categoryBtn.dataset.id.replace('@id', data.id);
 
     // Event
     categoryBtn.addEventListener('click', categoryAction)

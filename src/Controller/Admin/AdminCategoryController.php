@@ -70,6 +70,39 @@ class AdminCategoryController extends AbstractController
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
+    #[Route('/api/categories/{id}', name: 'api_category_update', methods: ['POST'])]
+    public function update(
+        int $id,
+        CategoryRepository $categoryRepository,
+        Request $request,
+        SerializerInterface $serializer,
+        ValidatorInterface $validator,
+        EntityManagerInterface $entityManager
+    ): Response
+    {
+        $updateName = $request->request->get('name');
+        $category = $categoryRepository->find($id);
+
+        if (!$category) {
+            throw new NotFoundHttpException('Category not found');
+        }
+
+        $category->setName($updateName);
+
+        $constraintsViolationList = $validator->validate($category);
+        ErrorsValidationBuilder::buildErrors($constraintsViolationList);
+
+        $json = $serializer->serialize(
+            $category,
+            'json',
+            [AbstractNormalizer::IGNORED_ATTRIBUTES => ['galleries']]
+        );
+
+        $entityManager->flush();
+
+        return new JsonResponse($json, Response::HTTP_OK, [], true);
+    }
+
     #[Route('/api/categories', name: 'api_category_search', methods: ['GET'])]
     public function search(
         Request $request,
