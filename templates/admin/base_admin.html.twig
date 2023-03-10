@@ -11,3 +11,7 @@
     {{ parent() }}
     {{ encore_entry_link_tags('app_admin') }}
 {% endblock %}
+
+{% block body %}
+    {{ include('partials/_navbar_admin.html.twig') }}
+{% endblock %}

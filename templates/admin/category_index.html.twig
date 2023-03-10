@@ -13,12 +13,13 @@
 {% endblock %}
 
 {% block body %}
+    {{ parent() }}
     <div class="page-wrapper">
         {{ include ('partials/_wave_header.html.twig', {
             title : 'Vos catégories',
             description : "Voici l'ensemble des catégories actuellement présentes sur le site. Vous pouvez ajouter une categorie en utilisant le formulaire ci-dessous ou bien modifier ou supprimer un catégorie en cliquant dessus.",
             breadcrumbs: [{'label': 'Admin','path': '#'},{'label': 'Catégories','path': path('admin_category_index')}],
-            actions: [{'label': 'Ajouter une catégorie','path': path('admin_gallery_create')}]
+            actions: [{'label': 'Ajouter une catégorie','path': '#name'}]
         }) }}
 
         <main class="container pt-4">

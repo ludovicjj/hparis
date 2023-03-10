@@ -13,6 +13,7 @@
 {% endblock %}
 
 {% block body %}
+    {{ parent() }}
     {% set visibility = (gallery.state) ? 'publique' : 'privée' %}
     <div class="page-wrapper">
         {{ include ('partials/_wave_header.html.twig', {
