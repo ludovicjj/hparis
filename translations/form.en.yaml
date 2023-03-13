@@ -17,3 +17,8 @@ form:
             label: "Télécharger"
         submit:
             label: "Sauvegarder"
+
+    category:
+        name:
+            label: "Nom de la catégorie"
+            help: "Le nom de la catégorie doit contenir au moins 3 lettres."

@@ -49,6 +49,19 @@ class CategoryRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+
+    public function findAllCategoriesWithCountGallery() {
+
+        return $this->_em->createQueryBuilder()
+            ->select('c.id, c.name')
+            ->from(Category::class, 'c')
+            ->leftJoin('c.galleries', 'g')
+            ->groupBy('c.id')
+            ->addSelect('count(g.id) AS gallery_count')
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Category[] Returns an array of Category objects
 //     */

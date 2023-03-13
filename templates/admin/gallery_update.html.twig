@@ -16,6 +16,7 @@
 {% endblock %}
 
 {% block body %}
+    {{ parent() }}
     <div class="page-wrapper">
         {{ include ('partials/_wave_header.html.twig', {
             title : 'Modifier une galerie',

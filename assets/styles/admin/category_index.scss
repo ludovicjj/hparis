@@ -1,0 +1,45 @@
+@import '../components/header_wave';
+@import "../components/footer_wave";
+
+main.container {
+    flex-grow: 1;
+}
+
+// form
+.wrapper-field {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    //align-items: center;
+    & .category-field {
+        flex: 1 1 auto;
+    }
+    button {
+        width: min-content;
+    }
+}
+
+// categories
+.category-wrapper {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    //border: solid 1px red;
+    &:has(.badge) {
+        margin-top: 3rem;
+        padding: 3rem 0;
+        border-top: 1px solid rgba(0,0,0,.1);
+    }
+    & .badge {
+        background-color: var(--main-light-color);
+        color: var(--main-color);
+    }
+}
+
+@media (min-width: 576px) {
+    .wrapper-field {
+        align-items: flex-start;
+        flex-direction: row;
+    }
+}

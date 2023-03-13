@@ -2,7 +2,7 @@ import TomSelect from "tom-select";
 
 async function onLoad(url) {
     const response = await fetch(url, {
-        method: 'POST',
+        method: 'GET',
         headers: {
             Accept: 'application/json'
         }
