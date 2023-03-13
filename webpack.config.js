@@ -25,6 +25,7 @@ Encore
     .addEntry('app_admin', './assets/js/app_admin.js')
     .addStyleEntry('home', './assets/styles/home.scss')
     .addEntry('login', './assets/js/login.js')
+    .addEntry('admin_dashboard', './assets/js/admin/admin_dashboard.js')
     .addEntry('admin_gallery_create', './assets/js/admin/gallery_create.js')
     .addEntry('admin_gallery_index', './assets/js/admin/gallery_index.js')
     .addEntry('admin_gallery_update', './assets/js/admin/gallery_update.js')

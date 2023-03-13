@@ -20,7 +20,7 @@
             title : 'Galerie: ' ~  gallery.title,
             description : "Voici l'ensemble des images qui sont présentes dans la galerie. Actuellement la galerie est <span class='state'>" ~ visibility ~"</span>",
             breadcrumbs: [
-                {'label': 'Admin','path': '#'},
+                {'label': 'Admin','path': path('admin_dashboard')},
                 {'label': 'Galerie','path': path('admin_gallery')},
                 {'label': gallery.title, 'path': path('admin_gallery_read', {id: gallery.id})}
             ],
