@@ -1,6 +1,6 @@
 {% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}{{ parent() }} - Catégories{% endblock %}
+{% block title %}{{ parent() }}{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -16,9 +16,13 @@
     {{ parent() }}
     <div class="page-wrapper">
         {{ include ('partials/_wave_header.html.twig', {
-            title : 'Vos catégories',
-            description : "Voici l'ensemble des catégories actuellement présentes sur le site. Vous pouvez ajouter une categorie en utilisant le formulaire ci-dessous ou bien modifier ou supprimer un catégorie en cliquant dessus.",
-            breadcrumbs: [{'label': 'Admin','path': '#'}]
+            title : 'Tableau de bord',
+            description : "Ici vous trouverez l'ensemble des informations présente sur le site",
+            breadcrumbs: [{'label': 'Admin','path': path('admin_dashboard')}]
         }) }}
+        <main class="container pt-4">
+
+        </main>
+        {{ include('partials/_footer_wave.html.twig') }}
     </div>
 {% endblock %}
