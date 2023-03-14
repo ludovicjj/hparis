@@ -19,6 +19,9 @@ main.container {
         & .card-title {
             color: var(--main-color);
         }
+        & .card-icon {
+            background-color: var(--main-light-color);
+        }
     }
     & .card-icon {
         margin-left: 1rem;
@@ -28,8 +31,9 @@ main.container {
         color: var(--main-color);
         width: 2.5rem;
         height: 2.5rem;
-        line-height: 2.5rem;
-        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         font-size: 1.2rem;
     }
     & .card-body {
