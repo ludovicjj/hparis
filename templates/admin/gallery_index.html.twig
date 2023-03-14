@@ -18,7 +18,7 @@
         {{ include ('partials/_wave_header.html.twig', {
             title : 'Vos galeries',
             description : "Voici l'ensemble des galeries actuellement présentes sur le site. Vous pouvez filtrer les galeries par les categories qui se trouvent ci-dessous.",
-            breadcrumbs: [{'label': 'Admin','path': '#'},{'label': 'Galerie','path': path('admin_gallery')}],
+            breadcrumbs: [{'label': 'Admin','path': path('admin_dashboard')},{'label': 'Galerie','path': path('admin_gallery')}],
             actions: [{'label': 'Ajouter une galerie','path': path('admin_gallery_create')}]
         }) }}
 
