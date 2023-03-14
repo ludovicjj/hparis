@@ -31,7 +31,7 @@
                             <p class="card-text">
                                 Il y a actuellement {{ galleryCount }} galerie{{ plurialGallery }} présente{{ plurialGallery }} sur le site.
                             </p>
-                            <a href="#" class="btn btn-main align-self-start">Voir les galeries</a>
+                            <a href="{{ path('admin_gallery') }}" class="btn btn-main align-self-start">Voir les galeries</a>
                         </div>
                     </div>
                 </div>
@@ -44,7 +44,7 @@
                             <p class="card-text">
                                 Il y a actuellement {{ categoryCount }} catégorie{{ plurialCategory }} présente{{ plurialCategory }} sur le site.
                             </p>
-                            <a href="#" class="btn btn-main align-self-start">Voir les catégories</a>
+                            <a href="{{ path('admin_category_index') }}" class="btn btn-main align-self-start">Voir les catégories</a>
                         </div>
                     </div>
                 </div>
@@ -57,7 +57,7 @@
                             <p class="card-text">
                                 Retourner sur le blog.
                             </p>
-                            <a href="#" class="btn btn-main align-self-start">Voir le blog</a>
+                            <a href="{{ path('app_home') }}" class="btn btn-main align-self-start">Voir le blog</a>
                         </div>
                     </div>
                 </div>
