@@ -14,6 +14,7 @@
 
 {% block body %}
     {{ parent() }}
+    {% set plurialGallery, plurialCategory = (galleryCount > 0) ? 's': '', (categoryCount > 0) ? 's': '' %}
     <div class="page-wrapper">
         {{ include ('partials/_wave_header.html.twig', {
             title : 'Tableau de bord',
@@ -27,7 +28,9 @@
                         <div class="card-icon"><i class="fa-solid fa-camera-retro"></i></div>
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title">Galerie</h5>
-                            <p class="card-text">Il y a actuellement 15 galeries présentes sur le site.</p>
+                            <p class="card-text">
+                                Il y a actuellement {{ galleryCount }} galerie{{ plurialGallery }} présente{{ plurialGallery }} sur le site.
+                            </p>
                             <a href="#" class="btn btn-main align-self-start">Voir les galeries</a>
                         </div>
                     </div>
@@ -38,8 +41,23 @@
                         <div class="card-icon"><i class="fa-solid fa-tag"></i></div>
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title">Catégorie</h5>
-                            <p class="card-text">Il y a actuellement 7 categories présentes sur le site.</p>
+                            <p class="card-text">
+                                Il y a actuellement {{ categoryCount }} catégorie{{ plurialCategory }} présente{{ plurialCategory }} sur le site.
+                            </p>
                             <a href="#" class="btn btn-main align-self-start">Voir les catégories</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                    <div class="card h-100">
+                        <div class="card-icon"><i class="fa-solid fa-star"></i></div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">Blog</h5>
+                            <p class="card-text">
+                                Retourner sur le blog.
+                            </p>
+                            <a href="#" class="btn btn-main align-self-start">Voir le blog</a>
                         </div>
                     </div>
                 </div>
